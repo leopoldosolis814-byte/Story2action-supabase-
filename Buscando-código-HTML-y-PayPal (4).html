@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>S2A Studio — Hamburguesería</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070f; --bg2: #0e0e1a; --fucsia: #ff2d78; --amarillo: #ffe600;
+    --blanco: #ffffff; --gris: #666680; --gris2: #333345;
+    --naranja-vibrante: #ff6a00;
+    --insta: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    --meta-blue: #0866FF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--blanco); font-family: 'Nunito', sans-serif; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
+
+  /* HEADER */
+  header { position: sticky; top: 0; z-index: 100; background: rgba(7,7,15,0.95); backdrop-filter: blur(16px); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,45,120,0.15); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--blanco); }
+  .logo em { color: var(--fucsia); font-style: normal; }
+  .rubro-tag { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--fucsia); }
+
+  /* HERO */
+  .hero { position: relative; padding: 20px 20px 15px; text-align: center; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: 38px; line-height: 0.9; color: var(--blanco); margin-bottom: 8px; }
+  .hero-title span { color: var(--amarillo); }
+  .hero-sub { font-size: 12px; color: var(--gris); max-width: 260px; margin: 0 auto; line-height: 1.4; }
+
+  /* ===== VIDEO CON PREVIEW ANIMADO ===== */
+  .tutorial-wrap { margin: 0 0 0; overflow: hidden; border-top: 1px solid rgba(255,45,120,0.1); border-bottom: 1px solid rgba(255,45,120,0.1); background: #000; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+  .tutorial-label { padding: 10px 15px; background: var(--bg2); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+  .tutorial-label-top { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--fucsia); }
+  .tutorial-label-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--blanco); }
+  .video-player { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; display: flex; align-items: center; overflow: hidden; }
+  #mainVideo { width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2; }
+
+  /* Preview con imágenes rotando (mobile-safe, sin autoplay) */
+  .video-preview-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .preview-img-layer { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1s ease, transform 6s ease; transform: scale(1.08); }
+  .preview-img-layer.active { opacity: 1; transform: scale(1); }
+  .preview-play-hint { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 4; pointer-events: none; }
+  .preview-play-circle { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,45,120,0.85); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 8px; box-shadow: 0 0 0 8px rgba(255,45,120,0.15); animation: pulsePlay 2s ease-in-out infinite; }
+  @keyframes pulsePlay { 0%,100%{ box-shadow: 0 0 0 8px rgba(255,45,120,0.15); } 50%{ box-shadow: 0 0 0 16px rgba(255,45,120,0.05); } }
+  .preview-play-label { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.7); }
+  .preview-label { position: absolute; top: 10px; left: 10px; background: rgba(255,45,120,0.9); font-family: 'Bebas Neue', sans-serif; font-size: 9px; letter-spacing: 2px; padding: 3px 8px; border-radius: 4px; color: white; z-index: 5; pointer-events: none; }
+
+  .controls { position: absolute; bottom: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; flex-direction: column; padding: 10px; z-index: 10; }
+  .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.3); cursor: pointer; margin-bottom: 10px; border-radius: 2px; }
+  .progress-filled { height: 100%; background: var(--fucsia); width: 0; border-radius: 2px; transition: width 0.1s linear; }
+  .control-btns { display: flex; align-items: center; gap: 15px; }
+  .play-btn, .fullscreen-btn { background: none; border: none; color: white; cursor: pointer; font-size: 20px; padding: 0; line-height: 1; }
+  .fullscreen-btn { margin-left: auto; font-size: 18px; }
+  .v-time { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #ccc; }
+  .video-player:fullscreen, .video-player:-webkit-full-screen { background: #000; display: flex; align-items: center; justify-content: center; }
+  .video-player:fullscreen #mainVideo, .video-player:-webkit-full-screen #mainVideo { object-fit: contain; max-height: 100vh; }
+
+  /* ===== DOS COLUMNAS CON PEEK PREVIEW ===== */
+  .two-col-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid rgba(255,255,255,0.05); }
+  .col-section { position: relative; border-right: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .col-section:last-child { border-right: none; }
+  .col-section.expanded { grid-column: 1 / -1; }
+
+  /* Cuando uno se expande, el otro se oculta */
+  .two-col-wrap.left-expanded .col-section:last-child { display: none; }
+  .two-col-wrap.right-expanded .col-section:first-child { display: none; }
+
+  .col-header { padding: 16px 12px; cursor: pointer; background: var(--bg2); border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: space-between; -webkit-tap-highlight-color: transparent; }
+  .col-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1.5px; line-height: 1.1; }
+  .col-title em { color: var(--fucsia); font-style: normal; display: block; }
+  .col-count { font-size: 9px; color: var(--gris); margin-top: 3px; font-weight: 700; letter-spacing: 1px; }
+  .col-chevron { font-size: 10px; color: var(--fucsia); transition: 0.3s; flex-shrink: 0; }
+  .col-section.open .col-chevron { transform: rotate(180deg); }
+
+  /* PEEK: valores fijos para mobile */
+  .col-body { overflow: hidden; height: 0; transition: height 0.45s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .col-section.peek .col-body { height: 150px; -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%); mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
+  .col-section.open .col-body { height: auto; max-height: 3000px; -webkit-mask-image: none; mask-image: none; overflow-y: visible; }
+  .col-body-inner { padding: 10px 8px 12px; }
+
+  /* GRID dentro de columna */
+  .col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .col-section.open.expanded .col-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ===== ITEMS (igual que antes) ===== */
+  .item { background: var(--bg2); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+  .thumb-wrap { position: relative; aspect-ratio: 9/16; background: #000; }
+  .thumb { width: 100%; height: 100%; object-fit: cover; }
+  .thumb-num { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.7); font-family: 'Bebas Neue', sans-serif; font-size: 9px; padding: 2px 5px; border-radius: 3px; z-index: 2; }
+  .lock-layer { position: absolute; inset: 0; background: rgba(7,7,15,0.8); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); z-index: 5; }
+  .lock-label { font-family: 'Bebas Neue', sans-serif; font-size: 9px; color: var(--fucsia); }
+  .item-foot { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .btn-ui { display: block; width: 100%; font-family: 'Bebas Neue', sans-serif; text-align: center; border-radius: 5px; padding: 8px; font-size: 10px; text-decoration: none; border: none; cursor: pointer; letter-spacing: 1px; }
+  .btn-save { background: var(--fucsia); color: white; }
+  .btn-copy { background: var(--naranja-vibrante); color: white; }
+  .btn-insta { background: var(--insta); color: white; }
+
+  /* ===== CARRUSEL TIER (igual que antes) ===== */
+  .tiers-section { border-top: 1px solid rgba(255,255,255,0.05); padding: 24px 0 8px; }
+  .tiers-section-label { font-family:'Bebas Neue',sans-serif; font-size:10px; letter-spacing:3px; color:var(--fucsia); padding: 0 16px 10px; display:block; }
+  .tiers-section-title { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--blanco); padding: 0 16px 16px; }
+  .tier-carousel-wrap { position:relative; overflow:hidden; }
+  .tier-carousel-track { display:flex; transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94); will-change:transform; }
+  .tier-banner-slide { min-width: calc(100% - 48px); margin: 0 8px; flex-shrink:0; }
+  .tier-banner { border-radius:20px; overflow:hidden; position:relative; padding:28px 24px 24px; min-height:240px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(255,255,255,0.08); }
+  .tier-banner-bg { position:absolute; inset:0; z-index:0; }
+  .tier-banner-glow { position:absolute; z-index:1; border-radius:50%; filter:blur(60px); pointer-events:none; }
+  .tier-banner-content { position:relative; z-index:2; }
+  .tier-banner-tag { font-family:'Bebas Neue',sans-serif; font-size:10px; letter-spacing:3px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .tier-banner-name { font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:0.9; letter-spacing:2px; margin-bottom:8px; }
+  .tier-banner-tagline { font-family:'Poppins',sans-serif; font-size:11px; line-height:1.4; margin-bottom:16px; opacity:0.7; color:#fff; }
+  .tier-banner-pills { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .tier-pill { font-family:'Bebas Neue',sans-serif; font-size:11px; letter-spacing:1px; padding:4px 12px; border-radius:20px; border:1px solid; }
+  .tier-banner-bottom { position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; }
+  .tier-desde { font-family:'Poppins',sans-serif; font-size:10px; color:rgba(255,255,255,0.45); }
+  .tier-precio { font-family:'Bebas Neue',sans-serif; font-size:26px; line-height:1; }
+  .btn-ver-planes { font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:1px; padding:12px 20px; border-radius:12px; border:none; cursor:pointer; white-space:nowrap; text-decoration:none; display:inline-block; }
+  .tier-banner.start   { background:linear-gradient(135deg,#0d0d1a 0%,#1a1a2e 100%); }
+  .tier-banner.growth  { background:linear-gradient(135deg,#0f0812 0%,#1e0a1e 100%); }
+  .tier-banner.premium { background:linear-gradient(135deg,#0f0d00 0%,#1e1800 100%); }
+  .tier-banner.flash   { background:linear-gradient(135deg,#100808 0%,#1e0e00 100%); }
+  .tier-banner.meta-ads { background:linear-gradient(135deg,#050515 0%,#070e2a 100%); border-color: rgba(8,102,255,0.3); }
+  .tier-banner.start   .tier-banner-name  { color:var(--blanco); }
+  .tier-banner.growth  .tier-banner-name  { color:var(--fucsia); }
+  .tier-banner.premium .tier-banner-name  { color:var(--amarillo); }
+  .tier-banner.flash   .tier-banner-name  { color:#ff6a00; }
+  .tier-banner.meta-ads .tier-banner-name { color:#0866FF; }
+  .tier-banner.start   .tier-banner-tag   { color:rgba(255,255,255,0.45); }
+  .tier-banner.growth  .tier-banner-tag   { color:var(--fucsia); }
+  .tier-banner.premium .tier-banner-tag   { color:var(--amarillo); }
+  .tier-banner.flash   .tier-banner-tag   { color:#ff6a00; }
+  .tier-banner.meta-ads .tier-banner-tag  { color:#0866FF; }
+  .tier-banner.start   .tier-pill { border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.6); }
+  .tier-banner.growth  .tier-pill { border-color:rgba(255,45,120,0.4); color:var(--fucsia); }
+  .tier-banner.premium .tier-pill { border-color:rgba(255,230,0,0.4); color:var(--amarillo); }
+  .tier-banner.flash   .tier-pill { border-color:rgba(255,106,0,0.4); color:#ff6a00; }
+  .tier-banner.meta-ads .tier-pill { border-color:rgba(8,102,255,0.4); color:#4d9fff; }
+  .tier-banner.start   .tier-precio { color:var(--blanco); }
+  .tier-banner.growth  .tier-precio { color:var(--fucsia); }
+  .tier-banner.premium .tier-precio { color:var(--amarillo); }
+  .tier-banner.flash   .tier-precio { color:#ff6a00; }
+  .tier-banner.meta-ads .tier-precio { color:#0866FF; }
+  .tier-banner.start   .btn-ver-planes { background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.2); }
+  .tier-banner.growth  .btn-ver-planes { background:var(--fucsia); color:white; }
+  .tier-banner.premium .btn-ver-planes { background:var(--amarillo); color:#000; }
+  .tier-banner.flash   .btn-ver-planes { background:#ff6a00; color:white; }
+  .tier-banner.meta-ads .btn-ver-planes { background:#0866FF; color:white; }
+  .tier-dots { display:flex; justify-content:center; gap:6px; padding:14px 0 4px; }
+  .tier-dot { width:6px; height:6px; border-radius:50%; background:#333; transition:all 0.3s; cursor:pointer; }
+  .tier-dot.active { background:var(--fucsia); width:18px; border-radius:3px; }
+  .tier-plans-panel { display:none; padding:0 16px 24px; animation:fadeIn 0.3s ease; }
+  .tier-plans-panel.open { display:block; }
+  .tier-plans-panel-header { display:flex; align-items:center; justify-content:space-between; padding:16px 0 12px; }
+  .tier-plans-panel-title { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; }
+  .tier-plans-close { background:transparent; border:1px solid rgba(255,255,255,0.1); color:var(--gris); font-size:12px; font-family:'Bebas Neue',sans-serif; letter-spacing:1px; padding:6px 12px; border-radius:8px; cursor:pointer; }
+
+  /* Plan cards */
+  .planes-grid { display: flex; flex-direction: column; gap: 14px; }
+  .plan-card { background: var(--bg2); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+  .plan-card-hero { height: 140px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 16px; }
+  .hero-img-layer { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1s ease, transform 5s ease; transform: scale(1.08); }
+  .hero-img-layer.active { opacity: 1; transform: scale(1); }
+  .hero-img-layer.out { opacity: 0; transform: scale(1.04); }
+  .plan-hero-bg { position: absolute; inset: 0; opacity: 0.15; }
+  .plan-hero-glow { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 200px; height: 100px; border-radius: 50%; filter: blur(30px); }
+  .plan-card.basic .plan-hero-glow { background: rgba(255,255,255,0.3); }
+  .plan-card.motion .plan-hero-glow { background: rgba(255,45,120,0.5); }
+  .plan-card.pro .plan-hero-glow { background: rgba(255,214,0,0.4); }
+  .plan-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; position: relative; z-index: 2; }
+  .plan-card.basic .plan-card-name { color: var(--blanco); }
+  .plan-card.motion .plan-card-name { color: var(--fucsia); }
+  .plan-card.pro .plan-card-name { color: var(--amarillo); }
+  .plan-card-badge { position: absolute; top: 12px; right: 12px; font-family: 'Bebas Neue', sans-serif; font-size: 9px; letter-spacing: 1px; padding: 4px 10px; border-radius: 20px; z-index: 2; }
+  .plan-card.motion .plan-card-badge { background: rgba(255,45,120,0.2); color: var(--fucsia); border: 1px solid rgba(255,45,120,0.3); }
+  .plan-card.pro .plan-card-badge { background: rgba(255,214,0,0.2); color: var(--amarillo); border: 1px solid rgba(255,214,0,0.3); }
+  .plan-card-body { padding: 16px; }
+  .plan-price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+  .plan-price { font-family: 'Bebas Neue', sans-serif; font-size: 36px; line-height: 1; }
+  .plan-card.basic .plan-price { color: var(--blanco); }
+  .plan-card.motion .plan-price { color: var(--fucsia); }
+  .plan-card.pro .plan-price { color: var(--amarillo); }
+  .plan-price-sub { font-size: 12px; color: var(--gris); font-family: 'Poppins', sans-serif; }
+  .plan-desc { font-size: 11px; color: var(--gris); font-family: 'Poppins', sans-serif; margin-bottom: 14px; line-height: 1.4; border-left: 2px solid rgba(255,45,120,0.3); padding-left: 10px; }
+  .plan-feats { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .plan-feats li { font-size: 12px; color: #ccc; display: flex; align-items: flex-start; gap: 8px; font-family: 'Poppins', sans-serif; line-height: 1.4; }
+  .plan-feats li::before { content: '✅'; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .plan-feats li span { color: var(--gris); }
+  .btn-plan { display: block; width: 100%; font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1px; padding: 14px; border-radius: 10px; border: none; cursor: pointer; text-align: center; text-decoration: none; }
+  .plan-card.basic .btn-plan { background: rgba(255,255,255,0.08); color: white; }
+  .plan-card.motion .btn-plan { background: var(--fucsia); color: white; }
+  .plan-card.pro .btn-plan { background: var(--amarillo); color: #000; }
+  .btn-pay-row { display: flex; gap: 8px; }
+  .btn-suscribir { flex: 1; background: var(--fucsia); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 12px; padding: 10px; border-radius: 8px; border: none; cursor: pointer; text-align: center; text-decoration: none; }
+  .btn-pack { flex: 1; background: rgba(255,255,255,0.08); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; text-align: center; text-decoration: none; }
+
+  /* Flash pack cards */
+  .flash-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .flash-card { background: var(--bg2); border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+  .flash-card.image-card { border-color: rgba(255,45,120,0.3); }
+  .flash-card.video-card { border-color: rgba(255,214,0,0.3); }
+  .flash-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 80px; height: 80px; border-radius: 50%; pointer-events: none; }
+  .flash-card.image-card::before { background: radial-gradient(circle, rgba(255,45,120,0.15), transparent 70%); }
+  .flash-card.video-card::before { background: radial-gradient(circle, rgba(255,214,0,0.12), transparent 70%); }
+  .flash-type { font-family: 'Bebas Neue', sans-serif; font-size: 9px; letter-spacing: 2px; margin-bottom: 6px; }
+  .flash-card.image-card .flash-type { color: var(--fucsia); }
+  .flash-card.video-card .flash-type { color: var(--amarillo); }
+  .flash-pack-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--blanco); margin-bottom: 2px; }
+  .flash-price { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; margin-bottom: 2px; }
+  .flash-card.image-card .flash-price { color: var(--fucsia); }
+  .flash-card.video-card .flash-price { color: var(--amarillo); }
+  .flash-price-sub { font-size: 10px; color: var(--gris); font-family: 'Poppins', sans-serif; margin-bottom: 12px; }
+  .flash-features { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .flash-features li { font-size: 10px; color: #bbb; display: flex; align-items: flex-start; gap: 5px; font-family: 'Poppins', sans-serif; line-height: 1.3; }
+  .flash-features li::before { content: '✅'; font-size: 9px; flex-shrink: 0; margin-top: 1px; }
+  .flash-pay-row { display: flex; flex-direction: column; gap: 6px; }
+  .btn-flash-pay { display: block; width: 100%; font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 1px; padding: 9px; border-radius: 7px; border: none; cursor: pointer; text-align: center; text-decoration: none; }
+  .btn-flash-pay.primary { background: var(--fucsia); color: white; }
+  .btn-flash-pay.secondary { background: rgba(255,255,255,0.08); color: #ccc; border: 1px solid rgba(255,255,255,0.1); }
+
+  /* ===== ACORDEONES (Cómo publicar + Calendario) con PEEK ===== */
+  .section { border-top: 1px solid rgba(255,255,255,0.05); }
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 2px; }
+  .section-title em { color: var(--fucsia); font-style: normal; }
+  .section-count { font-size: 10px; color: var(--gris); margin-top: 2px; font-weight: 700; }
+  .chevron { font-size: 10px; color: var(--fucsia); transition: 0.3s; }
+  .section.open .chevron { transform: rotate(180deg); }
+
+  /* Peek para secciones acordeón */
+  .section-body {
+    overflow: hidden;
+    height: 0;
+    transition: height 0.45s cubic-bezier(0.25,0.46,0.45,0.94);
+    padding: 0;
+  }
+  .section.peek .section-body {
+    height: 90px;
+    -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  }
+  .section.open .section-body {
+    height: auto;
+    max-height: 1200px;
+    overflow-y: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .section-body-inner { padding: 0 16px 24px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* STEPS */
+  .step { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .step-n { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--fucsia); opacity: 0.6; }
+  .step-t { font-weight: 900; font-size: 14px; margin-bottom: 2px; }
+  .step-d { font-size: 12px; color: var(--gris); line-height: 1.4; }
+
+  /* CALENDARIO */
+  .cal-inner { display: flex; flex-direction: column; gap: 12px; }
+  .cal-label { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--gris); }
+  .cal-input { background: var(--bg2); border: 1px solid rgba(255,45,120,0.2); border-radius: 8px; color: white; padding: 12px; font-family: 'Nunito', sans-serif; width: 100%; outline: none; color-scheme: dark; }
+  .btn-cal { background: var(--fucsia); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 16px; padding: 14px; border-radius: 8px; border: none; width: 100%; margin-top: 5px; cursor: pointer; }
+
+  /* ===== BOTÓN SOPORTE ===== */
+  .soporte-wrap { padding: 24px 16px 8px; }
+  .btn-soporte { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; background: var(--bg2); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; cursor: pointer; text-decoration: none; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+  .btn-soporte:active { transform: scale(0.98); }
+  .btn-soporte-icon { font-size: 22px; }
+  .btn-soporte-text { text-align: left; }
+  .btn-soporte-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; color: var(--blanco); }
+  .btn-soporte-sub { font-size: 10px; color: var(--gris); font-family: 'Poppins', sans-serif; margin-top: 1px; }
+  .btn-soporte-arrow { font-size: 18px; color: var(--fucsia); margin-left: auto; }
+
+  /* Calendly embed */
+  .calendly-wrap { display: none; margin: 12px 16px 0; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: var(--bg2); }
+  .calendly-wrap.open { display: block; }
+  .calendly-wrap iframe { width: 100%; height: 500px; border: none; }
+
+  footer { text-align: center; padding: 40px; font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #222; letter-spacing: 3px; }
+
+  /* ===== FLOATING STACK ===== */
+  #floatingStack { position: fixed; bottom: 24px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+  .float-panel { width: calc(100vw - 40px); max-width: 380px; height: 560px; background: #0A0A0A; border: 1px solid #1e1e1e; border-radius: 20px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,45,120,0.1); animation: panelIn 0.25s ease; }
+  .float-panel.open { display: flex; }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: none; } }
+  .fp-header { padding: 14px 16px; background: #111; border-bottom: 1px solid #1e1e1e; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .fp-header-left { display: flex; align-items: center; gap: 10px; }
+  .fp-avatar { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; color: #fff; font-family: 'Poppins', sans-serif; flex-shrink: 0; }
+  .fp-avatar.chat { background: linear-gradient(135deg, #FF2D7C, #FFD600); color: #000; }
+  .fp-name { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.82rem; color: #fff; letter-spacing: 0.03em; }
+  .fp-sub { font-family: 'Poppins', sans-serif; font-size: 0.65rem; color: #555; }
+  .fp-close { background: transparent; border: none; color: #444; font-size: 18px; cursor: pointer; line-height: 1; padding: 4px; border-radius: 6px; }
+  .fp-close:hover { color: #fff; }
+  .fab-btn { width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; transition: transform 0.2s, box-shadow 0.2s; flex-shrink: 0; }
+  .fab-btn:hover { transform: scale(1.08); }
+  .fab-btn:active { transform: scale(0.96); }
+  .fab-chat { background: linear-gradient(135deg, #FF2D7C, #c0206a); box-shadow: 0 4px 20px rgba(255,45,120,0.5); }
+
+  /* CHAT */
+  .cp-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #0A0A0A; }
+  .cp-messages::-webkit-scrollbar { width: 3px; }
+  .cp-messages::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 4px; }
+  .cp-suggestions { display: flex; flex-direction: column; gap: 8px; }
+  .cp-suggestions p { color: #444; font-family: 'Poppins', sans-serif; font-size: 0.72rem; text-align: center; margin-bottom: 2px; }
+  .cp-sug-btn { background: transparent; border: 1px solid #1e1e1e; border-radius: 10px; padding: 10px 13px; color: #888; font-size: 0.75rem; font-family: 'Poppins', sans-serif; text-align: left; cursor: pointer; transition: all 0.2s; line-height: 1.4; }
+  .cp-sug-btn:hover { border-color: rgba(255,45,120,0.4); color: #fff; }
+  .cp-msg { display: flex; align-items: flex-start; animation: cpFadeIn 0.25s ease; }
+  .cp-msg.user { justify-content: flex-end; }
+  .cp-msg-avatar { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, #FF2D7C, #FFD600); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; color: #000; font-family: 'Poppins', sans-serif; margin-right: 7px; flex-shrink: 0; margin-top: 2px; }
+  .cp-bubble { max-width: 82%; padding: 10px 13px; font-family: 'Poppins', sans-serif; font-size: 0.78rem; line-height: 1.55; white-space: pre-wrap; }
+  .cp-bubble.user { background: linear-gradient(135deg, #FF2D7C, #c0206a); border-radius: 16px 16px 4px 16px; color: #fff; }
+  .cp-bubble.assistant { background: #161616; border: 1px solid #222; border-radius: 16px 16px 16px 4px; color: #ddd; }
+  .cp-typing { display: flex; gap: 4px; align-items: center; padding: 12px 14px; }
+  .cp-dot { width: 5px; height: 5px; border-radius: 50%; background: #FF2D7C; animation: cpPulse 1.2s ease-in-out infinite; }
+  .cp-dot:nth-child(2) { animation-delay: 0.2s; }
+  .cp-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes cpPulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
+  @keyframes cpFadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  .cp-input-area { padding: 10px 12px 12px; background: #0A0A0A; border-top: 1px solid #1a1a1a; flex-shrink: 0; }
+  .cp-input-box { display: flex; gap: 8px; align-items: center; background: #111; border: 1px solid #222; border-radius: 13px; padding: 7px 7px 7px 13px; transition: border-color 0.2s; }
+  .cp-input-box:focus-within { border-color: rgba(255,45,120,0.4); }
+  #cpInput { flex: 1; background: transparent; border: none; color: #fff; font-size: 0.8rem; outline: none; font-family: 'Poppins', sans-serif; }
+  #cpInput::placeholder { color: #444; }
+  #cpSendBtn { background: #1a1a1a; border: none; border-radius: 9px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  #cpSendBtn.active { background: linear-gradient(135deg, #FF2D7C, #c0206a); }
+
+  /* ===== WIZARD META ADS (6 pasos) ===== */
+  .wizard-wrap { background: var(--bg); }
+  .wizard-progress { height: 3px; background: rgba(255,255,255,0.05); }
+  .wizard-fill { height: 100%; background: var(--meta-blue); transition: width 0.4s ease; }
+  .wizard-step { display: none; }
+  .wizard-step.active { display: block; animation: fadeIn 0.3s ease; }
+
+  /* Step header */
+  .wz-header { padding: 16px; background: var(--bg2); border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .wz-step-num { font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 700; color: var(--meta-blue); margin-bottom: 3px; letter-spacing: 0.5px; }
+  .wz-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; color: var(--blanco); }
+  .wz-hint { font-family: 'Poppins', sans-serif; font-size: 11px; color: var(--gris); margin-top: 3px; line-height: 1.4; }
+
+  .wz-body { padding: 14px 16px; }
+  .wz-label { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--gris); margin-bottom: 8px; display: block; margin-top: 14px; }
+  .wz-label:first-child { margin-top: 0; }
+  .wz-input { background: var(--bg2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 11px 13px; font-family: 'Poppins', sans-serif; font-size: 13px; width: 100%; outline: none; transition: border-color 0.2s; }
+  .wz-input:focus { border-color: var(--meta-blue); }
+  .wz-input::placeholder { color: var(--gris); }
+
+  /* Upload area */
+  .wz-upload { background: var(--bg2); border: 2px dashed rgba(255,255,255,0.1); border-radius: 10px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.2s; position: relative; overflow: hidden; }
+  .wz-upload:hover { border-color: rgba(255,45,120,0.4); }
+  .wz-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .wz-upload-icon { font-size: 28px; margin-bottom: 6px; }
+  .wz-upload-text { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--gris); }
+  .wz-upload-sub { font-size: 10px; color: var(--gris); font-family: 'Poppins', sans-serif; margin-top: 3px; }
+  .wz-preview-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; display: none; }
+
+  /* Opciones de enfoque */
+  .wz-option { background: var(--bg2); border: 2px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+  .wz-option:active { transform: scale(0.98); }
+  .wz-option.selected { border-color: var(--fucsia); background: rgba(255,45,120,0.05); }
+  .wz-option-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .wz-option.selected .wz-option-radio { border-color: var(--fucsia); background: var(--fucsia); }
+  .wz-option.selected .wz-option-radio::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: white; }
+  .wz-option-text { flex: 1; }
+  .wz-option-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--blanco); }
+  .wz-option-desc { font-size: 11px; color: var(--gris); font-family: 'Poppins', sans-serif; margin-top: 2px; }
+
+  /* Variantes generadas */
+  .wz-variant { background: var(--bg2); border: 2px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+  .wz-variant.selected { border-color: var(--fucsia); }
+  .wz-variant-label { font-family: 'Bebas Neue', sans-serif; font-size: 9px; letter-spacing: 2px; color: var(--gris); margin-bottom: 6px; }
+  .wz-variant.selected .wz-variant-label { color: var(--fucsia); }
+  .wz-variant-text { font-family: 'Poppins', sans-serif; font-size: 13px; color: var(--blanco); line-height: 1.5; }
+
+  /* Preview anuncio */
+  .wz-ad-preview { background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
+  .wz-ad-preview-header { background: #fff; padding: 10px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f0f2f5; }
+  .wz-ad-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--fucsia); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: white; flex-shrink: 0; }
+  .wz-ad-name { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700; color: #1c1e21; }
+  .wz-ad-sponsored { font-family: 'Poppins', sans-serif; font-size: 10px; color: #65676b; }
+  .wz-ad-image { width: 100%; aspect-ratio: 1; background: #e4e6ea; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .wz-ad-image img { width: 100%; height: 100%; object-fit: cover; }
+  .wz-ad-image .no-img { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: #999; }
+  .wz-ad-body { padding: 12px; }
+  .wz-ad-caption { font-family: 'Poppins', sans-serif; font-size: 13px; color: #1c1e21; line-height: 1.5; margin-bottom: 10px; }
+  .wz-ad-cta-bar { background: #f0f2f5; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; }
+  .wz-ad-link { font-family: 'Poppins', sans-serif; font-size: 11px; color: #65676b; }
+  .wz-ad-btn { background: var(--meta-blue); color: white; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: none; cursor: default; }
+
+  /* Spinner generando */
+  .wz-generating { text-align: center; padding: 30px 16px; }
+  .wz-spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--meta-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .wz-gen-text { font-family: 'Poppins', sans-serif; font-size: 13px; color: var(--gris); }
+
+  /* Paywall */
+  .wz-paywall { background: var(--bg2); border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 14px; }
+  .wz-paywall-top { background: linear-gradient(135deg, var(--meta-blue), #0052cc); padding: 20px; text-align: center; }
+  .wz-paywall-icon { font-size: 32px; margin-bottom: 8px; }
+  .wz-paywall-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: white; margin-bottom: 4px; }
+  .wz-paywall-sub { font-family: 'Poppins', sans-serif; font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.4; }
+  .wz-paywall-body { padding: 18px; }
+  .wz-paywall-price { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--meta-blue); text-align: center; margin-bottom: 4px; }
+  .wz-paywall-includes { font-family: 'Poppins', sans-serif; font-size: 11px; color: var(--gris); text-align: center; margin-bottom: 16px; }
+  .wz-btn-pay { display: block; width: 100%; background: var(--meta-blue); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 16px; padding: 14px; border-radius: 10px; border: none; cursor: pointer; text-align: center; margin-bottom: 8px; }
+  .wz-btn-pay.green { background: #00c853; }
+
+  /* Unlocked */
+  .wz-unlocked { display: none; }
+  .wz-unlocked-banner { background: #00a854; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .wz-unlocked-banner span { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px; color: white; }
+  .wz-copy-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 1px; padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 8px; transition: all 0.2s; }
+  .wz-copy-btn.copied { background: rgba(0,168,84,0.15); border-color: rgba(0,168,84,0.3); color: #00a854; }
+  .wz-btn-meta { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: var(--meta-blue); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 15px; padding: 14px; border-radius: 10px; border: none; cursor: pointer; text-decoration: none; }
+
+  /* Nav del wizard */
+  .wz-nav { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.05); background: var(--bg); position: sticky; bottom: 0; }
+  .wz-back { background: rgba(255,255,255,0.06); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 14px; padding: 12px 18px; border-radius: 8px; border: none; cursor: pointer; flex-shrink: 0; }
+  .wz-next { flex: 1; background: var(--meta-blue); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; }
+  .wz-next:disabled { background: rgba(255,255,255,0.1); color: var(--gris); cursor: not-allowed; }
+  .wz-next.generate { background: var(--fucsia); }
+
+  /* Output fields en wizard */
+  .wz-output-field { background: var(--bg2); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+  .wz-output-label { font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--gris); padding: 8px 12px 0; text-transform: uppercase; }
+  .wz-output-text { font-family: 'Poppins', sans-serif; font-size: 13px; color: var(--blanco); padding: 6px 12px 12px; line-height: 1.5; min-height: 36px; white-space: pre-wrap; }
+</style>
+<!-- Open Graph -->
+<meta property="og:title" content="S2A Studio — Tu Pack Listo 🍔">
+<meta property="og:description" content="Contenido estratégico para vender más hoy mismo. Imágenes, videos y anuncios listos para publicar.">
+<meta property="og:image" content="https://res.cloudinary.com/ds2udm1nc/image/upload/v1776733780/Copilot_20260403_080908_nvf2dg.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tu-dominio.vercel.app">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="S2A Studio — Tu Pack Listo 🍔">
+<meta name="twitter:description" content="Contenido estratégico para vender más hoy mismo.">
+<meta name="twitter:image" content="https://res.cloudinary.com/ds2udm1nc/image/upload/v1776733780/Copilot_20260403_080908_nvf2dg.png">
+</head>
+<body>
+
+<style>
+  .btn-acceso { background: none; border: 1px solid rgba(255,45,120,0.3); border-radius: 8px; padding: 6px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; -webkit-tap-highlight-color: transparent; }
+  .btn-acceso span { display: block; width: 18px; height: 2px; background: var(--fucsia); border-radius: 2px; }
+  .acceso-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9998; align-items: center; justify-content: center; }
+  .acceso-overlay.open { display: flex; }
+  .acceso-modal { background: var(--bg2); border: 1px solid rgba(255,45,120,0.2); border-radius: 20px; padding: 28px 24px; width: calc(100% - 48px); max-width: 340px; }
+  .acceso-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--blanco); margin-bottom: 4px; }
+  .acceso-sub { font-family: 'Poppins', sans-serif; font-size: 11px; color: var(--gris); margin-bottom: 20px; }
+  .acceso-input { background: var(--bg); border: 1px solid rgba(255,45,120,0.3); border-radius: 10px; color: white; padding: 13px; font-family: 'Poppins', sans-serif; font-size: 14px; width: 100%; outline: none; margin-bottom: 12px; letter-spacing: 1px; }
+  .acceso-input:focus { border-color: var(--fucsia); }
+  .acceso-btn { display: block; width: 100%; background: var(--fucsia); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; padding: 13px; border-radius: 10px; border: none; cursor: pointer; margin-bottom: 10px; }
+  .acceso-close { display: block; width: 100%; background: transparent; color: var(--gris); font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 1px; padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; }
+  .acceso-error { font-family: 'Poppins', sans-serif; font-size: 11px; color: var(--fucsia); margin-top: -6px; margin-bottom: 10px; display: none; }
+</style>
+
+<header>
+  <div class="logo">STORY<em>2</em>ACTION</div>
+  <div class="rubro-tag">HAMBURGUESERÍA</div>
+  <button class="btn-acceso" onclick="document.getElementById('accesoOverlay').classList.add('open');setTimeout(()=>document.getElementById('accesoInput').focus(),200);" title="Acceso cliente">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- MODAL ACCESO CLIENTE -->
+<div class="acceso-overlay" id="accesoOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="acceso-modal">
+    <div class="acceso-title">🔐 ACCESO CLIENTE</div>
+    <div class="acceso-sub">Ingresá tu código para ver tu panel personalizado</div>
+    <input class="acceso-input" id="accesoInput" type="text" placeholder="Ej: act123" autocomplete="off" onkeydown="if(event.key==='Enter')accesoGo()">
+    <div class="acceso-error" id="accesoError">Código incorrecto. Revisá con tu proveedor.</div>
+    <button class="acceso-btn" onclick="accesoGo()">→ INGRESAR</button>
+    <button class="acceso-close" onclick="document.getElementById('accesoOverlay').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
+<script>
+  // ── MAPA: código → IDs numéricos que desbloquea ──
+  const ACCESO_MAP = {
+    'act1':  [1],  'act2':  [2],  'act3':  [3],  'act4':  [4],
+    'act5':  [5],  'act6':  [6],  'act7':  [7],  'act8':  [8],
+    'act9':  [9],  'act10': [10], 'act11': [11], 'act12': [12],
+    'act13': [13], 'act14': [14], 'act15': [15], 'act16': [16],
+    // Combos especiales (ejemplos — agregá los que necesités)
+    'actall':  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+    'actimg':  [1,2,3,4,5,6,7,8,9,10,11,12],
+    'actvid':  [13,14,15,16],
+    'actstart':[1,2,3,4,13,14],
+  };
+
+  // Convierte lista de códigos ac a Set de IDs numéricos
+  function acCodesToIds(codesArr) {
+    const ids = new Set();
+    codesArr.forEach(c => {
+      const key = c.trim().toLowerCase();
+      if (ACCESO_MAP[key]) ACCESO_MAP[key].forEach(id => ids.add(id));
+    });
+    return ids;
+  }
+
+  // Desbloquea en el DOM los items ya renderizados
+  function desbloquearItems(idsSet) {
+    const link = new URLSearchParams(window.location.search).get('link') || 'tulocal.com';
+    const allData = [
+      { id:1,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701182/Copilot_20260401_005908_g21x7o.png",  frase:"click para descubrir 🤤", isVid:false },
+      { id:2,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701182/Copilot_20260408_211535_psh7uh.png",  frase:"click para develar el secreto 🤤", isVid:false },
+      { id:3,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701182/Copilot_20260408_211711_vbaout.png",  frase:"Click para saltarte la fila 🤤", isVid:false },
+      { id:4,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701181/Copilot_20260408_213805_qhfwdh.png",  frase:"click para ver capitulo 🤤", isVid:false },
+      { id:5,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701160/Copilot_20260408_214110_t0plun.png",  frase:"click para ver ficha 🤤", isVid:false },
+      { id:6,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701157/Copilot_20260408_214359_quokl0.png",  frase:"crea tu propia formula 🤤", isVid:false },
+      { id:7,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701156/Copilot_20260408_214032_xmozdi.png",  frase:"click para descubrir 🤤", isVid:false },
+      { id:8,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701156/Copilot_20260408_214236_jni0w8.png",  frase:"click para pecar 🤤", isVid:false },
+      { id:9,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701132/Copilot_20260408_214939_ez24qx.png",  frase:"click si te bancas un round 🤤", isVid:false },
+      { id:10, src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701118/Copilot_20260408_215042_giyuql.png",  frase:"click para seguir a la oruga 🤤", isVid:false },
+      { id:11, src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701117/Copilot_20260408_214540_p7yqiw.png",  frase:"click para burger infernal 🤤", isVid:false },
+      { id:12, src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701117/Copilot_20260408_221925_nykdko.png",  frase:"click para la más pedida 🤤", isVid:false },
+      { id:13, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616634/XRecorder_20260407_02_2_qlycjr.mp4", frase:"click si te bancas un round🤤", isVid:true },
+      { id:14, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616610/XRecorder_20260407_03_2_gh4ml7.mp4", frase:"click para pecar 🤤", isVid:true },
+      { id:15, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616560/XRecorder_20260407_04_2_zlmcw6.mp4", frase:"click para saltarte la fila 🤤", isVid:true },
+      { id:16, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616525/XRecorder_20260407_05_2_h1r9sw.mp4", frase:"click para burger infernal 🤤", isVid:true },
+    ];
+
+    // Re-renderizar grids con los nuevos IDs desbloqueados
+    ['gridImg','gridVid'].forEach(gridId => {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const isVid = gridId === 'gridVid';
+      const data = isVid ? allData.filter(d => d.isVid) : allData.filter(d => !d.isVid);
+      grid.innerHTML = data.map(it => {
+        const on = idsSet.has(it.id);
+        return `<div class="item">
+          <div class="thumb-wrap">
+            <div class="thumb-num">${it.isVid?'VID':'IMG'} ${String(it.id).padStart(2,'0')}</div>
+            ${it.isVid
+              ? `<video class="thumb" src="${it.src}" muted loop playsinline onclick="this.paused?this.play():this.pause()"></video>`
+              : `<img class="thumb" src="${it.src}" loading="lazy">`}
+            ${!on ? '<div class="lock-layer"><div class="lock-label">🔒 BLOQUEADO</div></div>' : ''}
+          </div>
+          ${on ? `<div class="item-foot">
+            <a href="${it.src}" target="_blank" class="btn-ui btn-save">⬇ GUARDAR</a>
+            <button class="btn-ui btn-copy" onclick="copyAction(this,'${link}')">🔗 ENLACE</button>
+            <button class="btn-ui btn-copy" onclick="copyAction(this,'${it.frase}')">📝 STICKER</button>
+            <a href="https://www.instagram.com/reels/create/" target="_blank" class="btn-ui btn-insta">📸 PUBLICAR</a>
+          </div>` : ''}
+        </div>`;
+      }).join('');
+    });
+  }
+
+  // ── Auto-desbloqueo por URL ?ac=act1,act2,... ──
+  (function initAcceso() {
+    const params = new URLSearchParams(window.location.search);
+    const acParam = params.get('ac');
+    if (acParam) {
+      const codes = acParam.split(',');
+      const ids = acCodesToIds(codes);
+      if (ids.size > 0) {
+        // Ocultar modal de acceso — ya está autenticado por URL
+        const overlay = document.getElementById('accesoOverlay');
+        if (overlay) overlay.style.display = 'none';
+        // Desbloquear cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => desbloquearItems(ids));
+      }
+    }
+  })();
+
+  // ── Acceso manual por código ──
+  function accesoGo() {
+    const raw = document.getElementById('accesoInput').value.trim();
+    const err = document.getElementById('accesoError');
+    if (!raw) { err.style.display = 'block'; err.textContent = 'Ingresá tu código.'; return; }
+    const codes = raw.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+    const ids = acCodesToIds(codes);
+    if (ids.size === 0) {
+      err.style.display = 'block';
+      err.textContent = 'Código incorrecto. Revisá con tu proveedor.';
+      return;
+    }
+    err.style.display = 'none';
+    const btn = document.querySelector('.acceso-btn');
+    btn.textContent = 'Desbloqueando...';
+    btn.disabled = true;
+    setTimeout(() => {
+      desbloquearItems(ids);
+      document.getElementById('accesoOverlay').classList.remove('open');
+      btn.textContent = '→ INGRESAR';
+      btn.disabled = false;
+    }, 500);
+  }
+</script>
+
+<div class="hero">
+  <div class="hero-title">TU PACK <span>LISTO</span></div>
+  <div class="hero-sub">Contenido estratégico para vender más hoy mismo.</div>
+</div>
+
+<!-- VIDEO CON PREVIEW ANIMADO -->
+<div class="tutorial-wrap">
+  <div class="tutorial-label">
+    <div>
+      <div class="tutorial-label-top">▶ VIDEO GUÍA</div>
+      <div class="tutorial-label-title">MIRÁ CÓMO PUBLICAR</div>
+    </div>
+    <div id="previewLabel" class="preview-label" style="position:relative;top:auto;left:auto;">PREVIEW</div>
+  </div>
+  <div class="video-player" id="videoContainer">
+    <!-- Preview overlay: imágenes rotando con ken burns (mobile-safe) -->
+    <div class="video-preview-overlay" id="previewOverlay">
+      <div class="preview-img-layer" id="prevLayerA"></div>
+      <div class="preview-img-layer" id="prevLayerB"></div>
+      <div class="preview-play-hint" id="previewPlayHint">
+        <div class="preview-play-circle">▶</div>
+        <div class="preview-play-label">TOCÁ PARA VER</div>
+      </div>
+    </div>
+    <video id="mainVideo" src="https://res.cloudinary.com/ds2udm1nc/video/upload/v1775729773/XRecorder_20260409_08_3_wdfeek.mp4" playsinline style="opacity:0;position:relative;z-index:2;"></video>
+    <div class="controls">
+      <div class="progress-bar" id="pBar"><div class="progress-filled" id="pFill"></div></div>
+      <div class="control-btns">
+        <button class="play-btn" id="playToggle">▶</button>
+        <span class="v-time" id="vTime">0:00 / 0:00</span>
+        <button class="fullscreen-btn" id="fsToggle">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOS COLUMNAS: IMÁGENES + VIDEOS con PEEK PREVIEW -->
+<div class="two-col-wrap" id="twoCol">
+
+  <!-- COLUMNA IZQUIERDA: IMÁGENES GANCHO -->
+  <div class="col-section peek" id="colImg">
+    <div class="col-header" onclick="toggleCol('colImg','twoCol','left')">
+      <div>
+        <div class="col-title">IMÁGENES <em>GANCHO</em></div>
+        <div class="col-count">12 ARCHIVOS</div>
+      </div>
+      <div class="col-chevron">▼</div>
+    </div>
+    <div class="col-body">
+      <div class="col-body-inner">
+        <div class="col-grid" id="gridImg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLUMNA DERECHA: VIDEOS GANCHO -->
+  <div class="col-section peek" id="colVid">
+    <div class="col-header" onclick="toggleCol('colVid','twoCol','right')">
+      <div>
+        <div class="col-title">VIDEOS <em>GANCHO</em></div>
+        <div class="col-count">4 ARCHIVOS</div>
+      </div>
+      <div class="col-chevron">▼</div>
+    </div>
+    <div class="col-body">
+      <div class="col-body-inner">
+        <div class="col-grid" id="gridVid"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CARRUSEL: PLANES + META ADS -->
+<div class="tiers-section">
+  <span class="tiers-section-label">⚡ STORY2ACTION</span>
+  <div class="tiers-section-title">PLANES Y HERRAMIENTAS</div>
+
+  <div class="tier-carousel-wrap" id="tierCarousel"
+       ontouchstart="tcTouchStart(event)" ontouchend="tcTouchEnd(event)">
+    <div class="tier-carousel-track" id="tierTrack">
+
+      <!-- BANNER START -->
+      <div class="tier-banner-slide">
+        <div class="tier-banner start">
+          <div class="tier-banner-bg" style="background:radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 60%);"></div>
+          <div class="tier-banner-glow" style="width:180px;height:180px;background:rgba(255,255,255,0.08);top:-40px;right:-40px;"></div>
+          <div class="tier-banner-content">
+            <div class="tier-banner-tag">📦 NIVEL 1</div>
+            <div class="tier-banner-name">START</div>
+            <div class="tier-banner-tagline">Para negocios que venden por Instagram y WhatsApp</div>
+            <div class="tier-banner-pills"><span class="tier-pill">Basic</span><span class="tier-pill">Motion</span><span class="tier-pill">Pro</span></div>
+          </div>
+          <div class="tier-banner-bottom">
+            <div><div class="tier-desde">Desde</div><div class="tier-precio">$35 USD/mes</div></div>
+            <button class="btn-ver-planes" onclick="tcOpenPanel('start')">🚀 Ver planes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER GROWTH -->
+      <div class="tier-banner-slide">
+        <div class="tier-banner growth">
+          <div class="tier-banner-bg" style="background:radial-gradient(ellipse at 80% 20%, rgba(255,45,120,0.1) 0%, transparent 60%);"></div>
+          <div class="tier-banner-glow" style="width:180px;height:180px;background:rgba(255,45,120,0.12);top:-40px;right:-40px;"></div>
+          <div class="tier-banner-content">
+            <div class="tier-banner-tag">🚀 NIVEL 2</div>
+            <div class="tier-banner-name">GROWTH</div>
+            <div class="tier-banner-tagline">Para negocios con múltiples productos</div>
+            <div class="tier-banner-pills"><span class="tier-pill">Basic</span><span class="tier-pill">Motion</span><span class="tier-pill">Pro</span></div>
+          </div>
+          <div class="tier-banner-bottom">
+            <div><div class="tier-desde">Desde</div><div class="tier-precio">$55 USD/mes</div></div>
+            <button class="btn-ver-planes" onclick="tcOpenPanel('growth')">🚀 Ver planes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER PREMIUM -->
+      <div class="tier-banner-slide">
+        <div class="tier-banner premium">
+          <div class="tier-banner-bg" style="background:radial-gradient(ellipse at 80% 20%, rgba(255,230,0,0.08) 0%, transparent 60%);"></div>
+          <div class="tier-banner-glow" style="width:180px;height:180px;background:rgba(255,230,0,0.1);top:-40px;right:-40px;"></div>
+          <div class="tier-banner-content">
+            <div class="tier-banner-tag">💎 NIVEL 3</div>
+            <div class="tier-banner-name">PREMIUM</div>
+            <div class="tier-banner-tagline">Para alto ticket y e-commerce</div>
+            <div class="tier-banner-pills"><span class="tier-pill">Basic</span><span class="tier-pill">Motion</span><span class="tier-pill">Pro</span></div>
+          </div>
+          <div class="tier-banner-bottom">
+            <div><div class="tier-desde">Desde</div><div class="tier-precio">$80 USD/mes</div></div>
+            <button class="btn-ver-planes" onclick="tcOpenPanel('premium')">🚀 Ver planes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER FLASH -->
+      <div class="tier-banner-slide">
+        <div class="tier-banner flash">
+          <div class="tier-banner-bg" style="background:radial-gradient(ellipse at 80% 20%, rgba(255,106,0,0.1) 0%, transparent 60%);"></div>
+          <div class="tier-banner-glow" style="width:180px;height:180px;background:rgba(255,106,0,0.12);top:-40px;right:-40px;"></div>
+          <div class="tier-banner-content">
+            <div class="tier-banner-tag">⚡ SIN COMPROMISO</div>
+            <div class="tier-banner-name">FLASH</div>
+            <div class="tier-banner-tagline">Probá el sistema con una sola pieza</div>
+            <div class="tier-banner-pills"><span class="tier-pill">Image $6</span><span class="tier-pill">Video $9</span></div>
+          </div>
+          <div class="tier-banner-bottom">
+            <div><div class="tier-desde">Desde</div><div class="tier-precio">$6 USD único</div></div>
+            <button class="btn-ver-planes" onclick="tcOpenPanel('flash')">⚡ Ver pack</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER META ADS -->
+      <div class="tier-banner-slide">
+        <div class="tier-banner meta-ads">
+          <div class="tier-banner-bg" style="background:radial-gradient(ellipse at 80% 20%, rgba(8,102,255,0.15) 0%, transparent 60%);"></div>
+          <div class="tier-banner-glow" style="width:180px;height:180px;background:rgba(8,102,255,0.15);top:-40px;right:-40px;"></div>
+          <div class="tier-banner-content">
+            <div class="tier-banner-tag">📣 IA INCLUIDA</div>
+            <div class="tier-banner-name">META ADS</div>
+            <div class="tier-banner-tagline">Copy + segmentación listos para pegar en 2 minutos</div>
+            <div class="tier-banner-pills"><span class="tier-pill">3 variantes</span><span class="tier-pill">Preview</span><span class="tier-pill">IA</span></div>
+          </div>
+          <div class="tier-banner-bottom">
+            <div><div class="tier-desde">Un solo pago</div><div class="tier-precio">$7 USD</div></div>
+            <button class="btn-ver-planes" onclick="tcOpenPanel('metaads')">Crear anuncio →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="tier-dots" id="tierDots"></div>
+
+  <!-- PANEL START -->
+  <div class="tier-plans-panel" id="panel-start">
+    <div class="tier-plans-panel-header">
+      <div class="tier-plans-panel-title" style="color:var(--blanco);">📦 PLANES START</div>
+      <button class="tier-plans-close" onclick="tcClosePanel('start')">✕ Cerrar</button>
+    </div>
+    <div class="planes-grid">
+      <div class="plan-card basic"><div class="plan-card-hero" id="hero-0-basic"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Basic</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$35 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>4 imágenes</b> gancho</li><li><b>4 micro-landings</b> <span>con efecto visual</span></li><li><b>4 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-start-basic" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/35" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20START%20Basic%20de%20%2435%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+      <div class="plan-card motion"><div class="plan-card-hero" id="hero-0-motion"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Motion</div><div class="plan-card-badge">⭐ MÁS ELEGIDO</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$55 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>2 imágenes</b> gancho</li><li><b>2 videos</b> gancho <span>con IA</span></li><li><b>4 micro-landings</b> <span>con efecto visual</span></li><li><b>4 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-start-motion" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/55" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20START%20Motion%20de%20%2455%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+      <div class="plan-card pro"><div class="plan-card-hero" id="hero-0-pro"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Pro</div><div class="plan-card-badge">💎 PREMIUM</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$75 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>3 imágenes</b> gancho</li><li><b>3 videos</b> gancho <span>con IA</span></li><li><b>6 micro-landings</b> <span>con efecto visual</span></li><li><b>6 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-start-pro" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/75" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20START%20Pro%20de%20%2475%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+    </div>
+  </div>
+
+  <!-- PANEL GROWTH -->
+  <div class="tier-plans-panel" id="panel-growth">
+    <div class="tier-plans-panel-header">
+      <div class="tier-plans-panel-title" style="color:var(--fucsia);">🚀 PLANES GROWTH</div>
+      <button class="tier-plans-close" onclick="tcClosePanel('growth')">✕ Cerrar</button>
+    </div>
+    <div class="planes-grid">
+      <div class="plan-card basic"><div class="plan-card-hero" id="hero-1-basic"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Basic</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$55 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>2 imágenes</b> gancho</li><li><b>2 videos</b> gancho <span>con IA</span></li><li><b>4 micro-landings</b> <span>multi-producto</span></li><li><b>4 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-growth-basic" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/55" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20GROWTH%20Basic%20de%20%2455%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+      <div class="plan-card motion"><div class="plan-card-hero" id="hero-1-motion"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Motion</div><div class="plan-card-badge">⭐ MÁS ELEGIDO</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$80 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>1 imagen</b> gancho</li><li><b>3 videos</b> gancho <span>con IA</span></li><li><b>4 micro-landings</b> <span>multi-producto</span></li><li><b>4 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-growth-motion" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/85" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20GROWTH%20Motion%20de%20%2485%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+      <div class="plan-card pro"><div class="plan-card-hero" id="hero-1-pro"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Pro</div><div class="plan-card-badge">💎 PREMIUM</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$110 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>2 imágenes</b> gancho</li><li><b>4 videos</b> gancho <span>con IA</span></li><li><b>6 micro-landings</b> <span>multi-producto</span></li><li><b>6 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-growth-pro" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/110" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20GROWTH%20Pro%20de%20%24110%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+    </div>
+  </div>
+
+  <!-- PANEL PREMIUM -->
+  <div class="tier-plans-panel" id="panel-premium">
+    <div class="tier-plans-panel-header">
+      <div class="tier-plans-panel-title" style="color:var(--amarillo);">💎 PLANES PREMIUM</div>
+      <button class="tier-plans-close" onclick="tcClosePanel('premium')">✕ Cerrar</button>
+    </div>
+    <div class="planes-grid">
+      <div class="plan-card basic"><div class="plan-card-hero" id="hero-2-basic"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Basic</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$80 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>1 imagen</b> gancho <span>premium</span></li><li><b>3 videos</b> gancho <span>con IA</span></li><li><b>4 micro-landings</b> <span>alta conversión</span></li><li><b>4 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-premium-basic" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/80" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20PREMIUM%20Basic%20de%20%2480%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+      <div class="plan-card motion"><div class="plan-card-hero" id="hero-2-motion"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Motion</div><div class="plan-card-badge">⭐ MÁS ELEGIDO</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$120 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>4 videos</b> gancho <span>con IA</span></li><li><b>4 micro-landings</b> <span>alta conversión</span></li><li><b>4 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-premium-motion" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/120" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20PREMIUM%20Motion%20de%20%24120%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+      <div class="plan-card pro"><div class="plan-card-hero" id="hero-2-pro"><div class="plan-hero-glow"></div><div class="plan-card-name" style="position:relative;z-index:2;">Pro</div><div class="plan-card-badge">💎 PREMIUM</div></div><div class="plan-card-body"><div class="plan-price-row"><span class="plan-price">$180 USD</span><span class="plan-price-sub">/ mes</span></div><ul class="plan-feats"><li><b>6 videos</b> gancho <span>calidad premium con IA</span></li><li><b>6 micro-landings</b> <span>alta conversión</span></li><li><b>6 mensajes</b> <span>pre-armados IG</span></li></ul><div class="btn-pay-row"><div id="pp-premium-pro" style="flex:1;"></div><a href="https://paypal.me/JorgeSolis549/180" target="_blank" class="btn-pack">📦 Pack único</a></div><div class="btn-pay-row" style="margin-top:6px;"><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Plan%20PREMIUM%20Pro%20de%20%24180%20por%20LemonCash" target="_blank" class="btn-pack" style="flex:1;background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:#ffe600;">🍋 LemonCash</a></div></div></div>
+    </div>
+  </div>
+
+  <!-- PANEL FLASH -->
+  <div class="tier-plans-panel" id="panel-flash">
+    <div class="tier-plans-panel-header">
+      <div class="tier-plans-panel-title" style="color:#ff6a00;">⚡ FLASH FUNNEL</div>
+      <button class="tier-plans-close" onclick="tcClosePanel('flash')">✕ Cerrar</button>
+    </div>
+    <p style="font-size:11px;color:var(--gris);font-family:'Poppins',sans-serif;line-height:1.4;margin-bottom:14px;border-left:2px solid rgba(255,106,0,0.4);padding-left:10px;">Probá el sistema sin compromiso con una sola pieza.</p>
+    <div class="flash-cards">
+      <div class="flash-card image-card"><div class="flash-type">⚡ FLASH IMAGE</div><div class="flash-pack-name">1 PIEZA</div><div class="flash-price">$6</div><div class="flash-price-sub">USD · pago único</div><ul class="flash-features"><li><b>1 imagen</b> gancho</li><li><b>1 micro-landing</b> con efecto visual</li><li><b>1 mensaje</b> pre-armado IG</li></ul><div class="flash-pay-row"><a href="https://paypal.me/JorgeSolis549/6" target="_blank" class="btn-flash-pay primary">💳 PayPal</a><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Pack%20FLASH%20Image%20de%20%246%20por%20LemonCash" target="_blank" class="btn-flash-pay secondary">🍋 LemonCash</a></div></div>
+      <div class="flash-card video-card"><div class="flash-type">⚡ FLASH VIDEO</div><div class="flash-pack-name">1 PIEZA</div><div class="flash-price">$9</div><div class="flash-price-sub">USD · pago único</div><ul class="flash-features"><li><b>1 video</b> gancho con IA</li><li><b>1 micro-landing</b> con efecto visual</li><li><b>1 mensaje</b> pre-armado IG</li></ul><div class="flash-pay-row"><a href="https://paypal.me/JorgeSolis549/9" target="_blank" class="btn-flash-pay primary">💳 PayPal</a><a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Pack%20FLASH%20Video%20de%20%249%20por%20LemonCash" target="_blank" class="btn-flash-pay secondary">🍋 LemonCash</a></div></div>
+    </div>
+  </div>
+
+  <!-- PANEL META ADS WIZARD -->
+  <div class="tier-plans-panel" id="panel-metaads">
+    <div class="tier-plans-panel-header">
+      <div class="tier-plans-panel-title" style="color:#0866FF;">📣 CREAR ANUNCIO EN META</div>
+      <button class="tier-plans-close" onclick="tcClosePanel('metaads')">✕ Cerrar</button>
+    </div>
+    <div class="wizard-wrap" id="wizardWrap">
+      <div class="wizard-progress"><div class="wizard-fill" id="wzFill" style="width:16.6%"></div></div>
+
+      <!-- PASO 1: Materiales -->
+      <div class="wizard-step active" id="wzStep1">
+        <div class="wz-header">
+          <div class="wz-step-num">PASO 1 DE 6 · MATERIALES</div>
+          <div class="wz-title">Subí tu imagen o video</div>
+          <div class="wz-hint">El contenido visual de tu anuncio.</div>
+        </div>
+        <div class="wz-body">
+          <span class="wz-label">📸 IMAGEN O VIDEO DEL PACK</span>
+          <div class="wz-upload" id="wzUploadArea">
+            <input type="file" accept="image/*,video/*" id="wzFileInput" onchange="wzHandleFile(this)">
+            <div class="wz-upload-icon">📤</div>
+            <div class="wz-upload-text">Tocá para subir</div>
+            <div class="wz-upload-sub">Imagen o video de tu pack</div>
+          </div>
+          <img id="wzPreviewImg" class="wz-preview-img">
+          <span class="wz-label">🔗 ENLACE DE TU LANDING PAGE</span>
+          <input class="wz-input" id="wzLink" placeholder="https://tulocal.com/menu" oninput="wzCheckStep1()">
+          <span class="wz-label">📝 FRASE DEL STICKER</span>
+          <input class="wz-input" id="wzSticker" placeholder="Ej: click para ver el menú 🤤" oninput="wzCheckStep1()">
+        </div>
+        <div class="wz-nav">
+          <button class="wz-next" id="wzNext1" onclick="wzGo(2)" disabled>Continuar →</button>
+        </div>
+      </div>
+
+      <!-- PASO 2: Segmentación -->
+      <div class="wizard-step" id="wzStep2">
+        <div class="wz-header">
+          <div class="wz-step-num">PASO 2 DE 6 · PÚBLICO</div>
+          <div class="wz-title">¿A quién le mostramos?</div>
+          <div class="wz-hint">Definí tu audiencia objetivo.</div>
+        </div>
+        <div class="wz-body">
+          <span class="wz-label">📍 CIUDAD / ZONA</span>
+          <input class="wz-input" id="wzCiudad" placeholder="Ej: Buenos Aires, Palermo" oninput="wzCheckStep2()">
+          <span class="wz-label">🎂 RANGO DE EDAD</span>
+          <input class="wz-input" id="wzEdad" placeholder="Ej: 25-34" oninput="wzCheckStep2()">
+          <span class="wz-label">🔑 PALABRAS CLAVE</span>
+          <input class="wz-input" id="wzKeywords" placeholder="Ej: comida rápida, hamburguesas, delivery" oninput="wzCheckStep2()">
+        </div>
+        <div class="wz-nav">
+          <button class="wz-back" onclick="wzGo(1)">← Atrás</button>
+          <button class="wz-next" id="wzNext2" onclick="wzGo(3)" disabled>Continuar →</button>
+        </div>
+      </div>
+
+      <!-- PASO 3: Enfoque -->
+      <div class="wizard-step" id="wzStep3">
+        <div class="wz-header">
+          <div class="wz-step-num">PASO 3 DE 6 · ESTRATEGIA</div>
+          <div class="wz-title">¿Qué ángulo querés atacar?</div>
+          <div class="wz-hint">Elegí el enfoque de tu anuncio.</div>
+        </div>
+        <div class="wz-body">
+          <div class="wz-option" id="wzOpt1" onclick="wzSelectFocus('dolor',this)">
+            <div class="wz-option-radio"></div>
+            <div class="wz-option-text">
+              <div class="wz-option-title">😫 DOLOR</div>
+              <div class="wz-option-desc">Ej: "¿Cansado de la comida fría?"</div>
+            </div>
+          </div>
+          <div class="wz-option" id="wzOpt2" onclick="wzSelectFocus('beneficio',this)">
+            <div class="wz-option-radio"></div>
+            <div class="wz-option-text">
+              <div class="wz-option-title">🏆 BENEFICIO</div>
+              <div class="wz-option-desc">Ej: "La mejor hamburguesa de la ciudad"</div>
+            </div>
+          </div>
+          <div class="wz-option" id="wzOpt3" onclick="wzSelectFocus('social',this)">
+            <div class="wz-option-radio"></div>
+            <div class="wz-option-text">
+              <div class="wz-option-title">👥 PRUEBA SOCIAL</div>
+              <div class="wz-option-desc">Ej: "Lo que dicen nuestros clientes"</div>
+            </div>
+          </div>
+        </div>
+        <div class="wz-nav">
+          <button class="wz-back" onclick="wzGo(2)">← Atrás</button>
+          <button class="wz-next generate" id="wzNext3" onclick="wzGo(4);wzGenerate()" disabled>Generar mis 3 Anuncios 🚀</button>
+        </div>
+      </div>
+
+      <!-- PASO 4: Variantes generadas -->
+      <div class="wizard-step" id="wzStep4">
+        <div class="wz-header">
+          <div class="wz-step-num">PASO 4 DE 6 · GENERACIÓN</div>
+          <div class="wz-title">Tus 3 anuncios listos</div>
+          <div class="wz-hint">Tocá el que más te guste.</div>
+        </div>
+        <div id="wzGenerating" class="wz-generating">
+          <div class="wz-spinner"></div>
+          <div class="wz-gen-text">Generando con IA...</div>
+        </div>
+        <div id="wzVariants" style="display:none;" class="wz-body">
+          <div class="wz-variant" id="wzVar1" onclick="wzSelectVariant(0,this)">
+            <div class="wz-variant-label">OPCIÓN 1 · DOLOR</div>
+            <div class="wz-variant-text" id="wzVarText1"></div>
+          </div>
+          <div class="wz-variant" id="wzVar2" onclick="wzSelectVariant(1,this)">
+            <div class="wz-variant-label">OPCIÓN 2 · BENEFICIO</div>
+            <div class="wz-variant-text" id="wzVarText2"></div>
+          </div>
+          <div class="wz-variant" id="wzVar3" onclick="wzSelectVariant(2,this)">
+            <div class="wz-variant-label">OPCIÓN 3 · SOCIAL</div>
+            <div class="wz-variant-text" id="wzVarText3"></div>
+          </div>
+        </div>
+        <div class="wz-nav">
+          <button class="wz-back" onclick="wzGo(3)">← Atrás</button>
+          <button class="wz-next" id="wzNext4" onclick="wzGo(5)" disabled>Ver preview →</button>
+        </div>
+      </div>
+
+      <!-- PASO 5: Preview visual -->
+      <div class="wizard-step" id="wzStep5">
+        <div class="wz-header">
+          <div class="wz-step-num">PASO 5 DE 6 · VISTA PREVIA</div>
+          <div class="wz-title">Así se ve tu anuncio</div>
+          <div class="wz-hint">Simulación en el feed de Meta.</div>
+        </div>
+        <div class="wz-body">
+          <div class="wz-ad-preview">
+            <div class="wz-ad-preview-header">
+              <div class="wz-ad-avatar">S2</div>
+              <div>
+                <div class="wz-ad-name">Tu Hamburguesería</div>
+                <div class="wz-ad-sponsored">Patrocinado · 🌐</div>
+              </div>
+            </div>
+            <div class="wz-ad-image" id="wzAdImage">
+              <div class="no-img">📷 Tu imagen aparecerá acá</div>
+            </div>
+            <div class="wz-ad-body">
+              <div class="wz-ad-caption" id="wzAdCaption">Tu texto aparecerá acá</div>
+            </div>
+            <div class="wz-ad-cta-bar">
+              <div class="wz-ad-link" id="wzAdLink">tulocal.com</div>
+              <button class="wz-ad-btn">Pedir ahora</button>
+            </div>
+          </div>
+          <div class="wz-output-field">
+            <div class="wz-output-label">Segmentación sugerida</div>
+            <div class="wz-output-text" id="wzSegPreview"></div>
+          </div>
+        </div>
+        <div class="wz-nav">
+          <button class="wz-back" onclick="wzGo(4)">← Atrás</button>
+          <button class="wz-next" onclick="wzGo(6)">Desbloquear kit →</button>
+        </div>
+      </div>
+
+      <!-- PASO 6: Pago y entrega -->
+      <div class="wizard-step" id="wzStep6">
+        <div class="wz-header">
+          <div class="wz-step-num">PASO 6 DE 6 · DESBLOQUEAR</div>
+          <div class="wz-title">Obtené tu kit completo</div>
+          <div class="wz-hint">Caption + segmentación + acceso a Meta Ads.</div>
+        </div>
+        <div class="wz-body">
+          <!-- PAYWALL -->
+          <div class="wz-paywall" id="wzPaywall">
+            <div class="wz-paywall-top">
+              <div class="wz-paywall-icon">🔒</div>
+              <div class="wz-paywall-title">Desbloqueá tu anuncio</div>
+              <div class="wz-paywall-sub">Pagá una vez y publicá en Meta Ads con todo listo para pegar.</div>
+            </div>
+            <div class="wz-paywall-body">
+              <div class="wz-paywall-price">$7 USD</div>
+              <div class="wz-paywall-includes">Caption + segmentación + acceso a Meta Ads Manager</div>
+              <a href="https://paypal.me/JorgeSolis549/7" target="_blank" class="wz-btn-pay" style="display:block;text-align:center;text-decoration:none;">💳 Pagar con PayPal</a>
+              <a href="https://wa.me/5493794522749?text=Hola%20Jorge!%20Quiero%20pagar%20el%20Anuncio%20Meta%20Ads%20de%20%247%20por%20LemonCash" target="_blank" class="wz-btn-pay green" style="display:block;text-align:center;text-decoration:none;">🍋 Pagar con LemonCash</a>
+            </div>
+          </div>
+          <!-- UNLOCKED -->
+          <div class="wz-unlocked" id="wzUnlocked">
+            <div class="wz-unlocked-banner">
+              <span>✅ ¡Anuncio desbloqueado!</span>
+            </div>
+            <div class="wz-output-field">
+              <div class="wz-output-label">Caption del anuncio</div>
+              <div class="wz-output-text" id="wzFinalCaption"></div>
+            </div>
+            <button class="wz-copy-btn" id="wzCopyCaption" onclick="wzCopy('wzFinalCaption','wzCopyCaption','📋 Copiar Caption')">📋 Copiar Caption</button>
+            <div class="wz-output-field">
+              <div class="wz-output-label">Segmentación sugerida</div>
+              <div class="wz-output-text" id="wzFinalSeg"></div>
+            </div>
+            <button class="wz-copy-btn" id="wzCopySeg" onclick="wzCopy('wzFinalSeg','wzCopySeg','📋 Copiar Segmentación')">📋 Copiar Segmentación</button>
+            <a href="https://adsmanager.facebook.com/adsmanager/creation" target="_blank" class="wz-btn-meta" style="margin-top:8px;">
+              <svg width="18" height="18" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="8" fill="#fff"/><path d="M20 10C14.477 10 10 14.477 10 20C10 24.991 13.657 29.128 18.438 29.878V22.891H15.898V20H18.438V17.797C18.438 15.29 19.931 13.907 22.215 13.907C23.309 13.907 24.453 14.102 24.453 14.102V16.562H23.193C21.95 16.562 21.563 17.333 21.563 18.125V20H24.336L23.893 22.891H21.563V29.878C26.343 29.128 30 24.991 30 20C30 14.477 25.523 10 20 10Z" fill="#0866FF"/></svg>
+              Ir a Meta Ads Manager
+            </a>
+          </div>
+        </div>
+        <div class="wz-nav">
+          <button class="wz-back" onclick="wzGo(5)">← Atrás</button>
+        </div>
+      </div>
+
+    </div><!-- /wizard-wrap -->
+  </div><!-- /panel-metaads -->
+
+</div><!-- /tiers-section -->
+
+<!-- ACORDEÓN: CÓMO PUBLICAR (con peek) -->
+<div class="section peek" id="secPublicar">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div><div class="section-title">CÓMO <em>PUBLICAR</em></div><div class="section-count">GUÍA RÁPIDA</div></div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="section-body">
+    <div class="section-body-inner">
+      <div class="step"><div class="step-n">1</div><div><div class="step-t">Guardá el archivo</div><div class="step-d">Tocá en "GUARDAR" y bajalo a tu galería.</div></div></div>
+      <div class="step"><div class="step-n">2</div><div><div class="step-t">Copiá tus textos</div><div class="step-d">Copiá el Enlace y luego el Texto del Sticker.</div></div></div>
+      <div class="step"><div class="step-n">3</div><div><div class="step-t">¡A Instagram!</div><div class="step-d">Subí tu historia y usá el sticker de enlace con lo copiado.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ACORDEÓN: CALENDARIO (con peek) -->
+<div class="section peek" id="secCalendario">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div><div class="section-title">PROGRAMAR <em>RECORDATORIO</em></div><div class="section-count">NOTIFICACIÓN MÓVIL</div></div>
+    <div class="chevron">▼</div>
+  </div>
+  <div class="section-body">
+    <div class="section-body-inner">
+      <div class="cal-inner">
+        <div class="cal-label">¿QUÉ PUBLICAMOS?</div>
+        <input class="cal-input" id="calNota" type="text" placeholder="Ej: IMG 05 - Promo Noche">
+        <div class="cal-label">FECHA Y HORA</div>
+        <input class="cal-input" id="calFecha" type="datetime-local">
+        <button class="btn-cal" onclick="alert('Recordatorio activado!')">⏰ ACTIVAR AVISO</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTÓN SOPORTE + CALENDLY -->
+<div class="soporte-wrap">
+  <div class="btn-soporte" onclick="toggleCalendly()">
+    <div class="btn-soporte-icon">🎧</div>
+    <div class="btn-soporte-text">
+      <div class="btn-soporte-title">¿NECESITÁS AYUDA?</div>
+      <div class="btn-soporte-sub">Contactá con soporte · Reservá un turno</div>
+    </div>
+    <div class="btn-soporte-arrow" id="soporteArrow">▼</div>
+  </div>
+  <div class="calendly-wrap" id="calendlyWrap">
+    <!-- Reemplazá esta URL con tu link de Calendly real -->
+    <iframe src="https://calendly.com/story2action/soporte" frameborder="0"></iframe>
+  </div>
+</div>
+
+<footer>STORY<em>2</em>ACTION · 2026</footer>
+
+<!-- FLOATING STACK -->
+<div id="floatingStack">
+  <!-- CHAT PANEL -->
+  <div class="float-panel" id="chatPanel">
+    <div class="fp-header">
+      <div class="fp-header-left">
+        <div class="fp-avatar chat">S</div>
+        <div>
+          <div class="fp-name">S2A STRATEGIST</div>
+          <div class="fp-sub">IA para Marketing · Story2Action</div>
+        </div>
+      </div>
+      <button class="fp-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="cp-messages" id="cpMessages">
+      <div class="cp-suggestions" id="cpSuggestions">
+        <p>¿En qué te ayudo hoy?</p>
+        <button class="cp-sug-btn" onclick="cpSendMsg('¿Qué historia de Instagram convierte más para una hamburguesería?')">¿Qué historia convierte más para hamburguesería?</button>
+        <button class="cp-sug-btn" onclick="cpSendMsg('Dame un hook para promocionar una burger especial esta semana')">Hook para burger especial esta semana</button>
+        <button class="cp-sug-btn" onclick="cpSendMsg('¿Cómo uso el sticker de enlace en Instagram Stories?')">¿Cómo uso el sticker de enlace?</button>
+        <button class="cp-sug-btn" onclick="cpSendMsg('Ideas para aumentar ventas este fin de semana')">Ideas para aumentar ventas este finde</button>
+      </div>
+    </div>
+    <div class="cp-input-area">
+      <div class="cp-input-box">
+        <input type="text" id="cpInput" placeholder="Escribí tu consulta..." />
+        <button id="cpSendBtn" onclick="cpSendMsg()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M22 2L11 13" stroke="#444" stroke-width="2" stroke-linecap="round" id="cpArrow1"/>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="cpArrow2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB CHAT -->
+  <div style="display:flex; gap:12px; align-items:center;">
+    <button class="fab-btn fab-chat" id="chatFab" onclick="toggleChat()" title="S2A Strategist">
+      <span id="fabIcon">💬</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const link = params.get('link') || 'tulocal.com';
+
+  // Resolver IDs activos desde ?ac= (nuevo sistema) o ?activas= (legacy)
+  function resolveActivas() {
+    const acParam = params.get('ac');
+    if (acParam) {
+      const codes = acParam.split(',');
+      return acCodesToIds(codes); // usa el mapa del sistema de acceso
+    }
+    // Fallback legacy: ?activas=1,2,3
+    return new Set((params.get('activas') || '1,2,3,4,13,14').split(',').map(Number));
+  }
+  // acCodesToIds puede no estar definido aún al cargar (está en script anterior), usamos DOMContentLoaded
+  const activas = new Set((params.get('activas') || '1,2,3,4,13,14').split(',').map(Number));
+
+  const IMGS = [
+    { id:1,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701182/Copilot_20260401_005908_g21x7o.png",  frase:"click para descubrir 🤤" },
+    { id:2,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701182/Copilot_20260408_211535_psh7uh.png",  frase:"click para develar el secreto 🤤" },
+    { id:3,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701182/Copilot_20260408_211711_vbaout.png",  frase:"Click para saltarte la fila 🤤" },
+    { id:4,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701181/Copilot_20260408_213805_qhfwdh.png",  frase:"click para ver capitulo 🤤" },
+    { id:5,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701160/Copilot_20260408_214110_t0plun.png",  frase:"click para ver ficha 🤤" },
+    { id:6,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701157/Copilot_20260408_214359_quokl0.png",  frase:"crea tu propia formula 🤤" },
+    { id:7,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701156/Copilot_20260408_214032_xmozdi.png",  frase:"click para descubrir 🤤" },
+    { id:8,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701156/Copilot_20260408_214236_jni0w8.png",  frase:"click para pecar 🤤" },
+    { id:9,  src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701132/Copilot_20260408_214939_ez24qx.png",  frase:"click si te bancas un round 🤤" },
+    { id:10, src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701118/Copilot_20260408_215042_giyuql.png",  frase:"click para seguir a la oruga 🤤" },
+    { id:11, src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701117/Copilot_20260408_214540_p7yqiw.png",  frase:"click para burger infernal 🤤" },
+    { id:12, src:"https://res.cloudinary.com/ds2udm1nc/image/upload/v1775701117/Copilot_20260408_221925_nykdko.png",  frase:"click para la más pedida 🤤" }
+  ];
+  const VIDS = [
+    { id:13, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616634/XRecorder_20260407_02_2_qlycjr.mp4", frase:"click si te bancas un round🤤" },
+    { id:14, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616610/XRecorder_20260407_03_2_gh4ml7.mp4", frase:"click para pecar 🤤" },
+    { id:15, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616560/XRecorder_20260407_04_2_zlmcw6.mp4", frase:"click para saltarte la fila 🤤" },
+    { id:16, src:"https://res.cloudinary.com/ds2udm1nc/video/upload/v1775616525/XRecorder_20260407_05_2_h1r9sw.mp4", frase:"click para burger infernal 🤤" }
+  ];
+
+  function render(data, gridId, isVid) {
+    document.getElementById(gridId).innerHTML = data.map(it => {
+      const on = activas.has(it.id);
+      return `<div class="item">
+        <div class="thumb-wrap">
+          <div class="thumb-num">${isVid?'VID':'IMG'} ${String(it.id).padStart(2,'0')}</div>
+          ${isVid?`<video class="thumb" src="${it.src}" muted loop playsinline onclick="this.paused?this.play():this.pause()"></video>`:`<img class="thumb" src="${it.src}" loading="lazy">`}
+          ${!on?'<div class="lock-layer"><div class="lock-label">🔒 BLOQUEADO</div></div>':''}
+        </div>
+        ${on?`<div class="item-foot">
+          <a href="${it.src}" target="_blank" class="btn-ui btn-save">⬇ GUARDAR</a>
+          <button class="btn-ui btn-copy" onclick="copyAction(this,'${link}')">🔗 ENLACE</button>
+          <button class="btn-ui btn-copy" onclick="copyAction(this,'${it.frase}')">📝 STICKER</button>
+          <a href="https://www.instagram.com/reels/create/" target="_blank" class="btn-ui btn-insta">📸 PUBLICAR</a>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }
+  // Initial render with legacy activas (or default)
+  render(IMGS,'gridImg',false);
+  render(VIDS,'gridVid',true);
+
+  // Si hay ?ac= en la URL, re-renderizar con los IDs correctos después de que el DOM esté pintado
+  (function applyAcParam() {
+    const acParam = params.get('ac');
+    if (!acParam) return;
+    const codes = acParam.split(',');
+    // Esperar a que acCodesToIds esté disponible (definida en el script anterior)
+    const tryUnlock = () => {
+      if (typeof acCodesToIds === 'function') {
+        const ids = acCodesToIds(codes);
+        if (ids.size > 0) desbloquearItems(ids);
+      }
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryUnlock);
+    } else {
+      tryUnlock();
+    }
+  })();
+
+  async function copyAction(btn,txt){
+    try{await navigator.clipboard.writeText(txt);const old=btn.innerText;btn.innerText='✅ COPIADO';btn.style.background='#25d366';setTimeout(()=>{btn.innerText=old;btn.style.background='';},1500);}
+    catch{alert('No se pudo copiar.');}
+  }
+
+  // ===== ACORDEÓN PEEK =====
+  function toggleSection(header) {
+    const sec = header.parentElement;
+    const isOpen = sec.classList.contains('open');
+    if (isOpen) {
+      sec.classList.remove('open');
+      sec.classList.add('peek');
+    } else {
+      sec.classList.remove('peek');
+      sec.classList.add('open');
+    }
+  }
+
+  // Peek hover en secciones
+  document.querySelectorAll('.section.peek .section-header').forEach(h => {
+    h.addEventListener('mouseenter', () => {
+      const sec = h.parentElement;
+      if (!sec.classList.contains('open')) sec.classList.add('peek');
+    });
+  });
+
+  // ===== DOS COLUMNAS TOGGLE =====
+  function toggleCol(colId, wrapId, side) {
+    const col = document.getElementById(colId);
+    const wrap = document.getElementById(wrapId);
+    const isOpen = col.classList.contains('open');
+
+    // Reset all
+    wrap.classList.remove('left-expanded','right-expanded');
+    document.querySelectorAll('.col-section').forEach(c => {
+      c.classList.remove('open','expanded','peek');
+      c.classList.add('peek');
+    });
+
+    if (!isOpen) {
+      col.classList.remove('peek');
+      col.classList.add('open','expanded');
+      wrap.classList.add(side === 'left' ? 'left-expanded' : 'right-expanded');
+    }
+  }
+
+  // ===== VIDEO: PREVIEW CON IMÁGENES (mobile-safe) + PLAYER =====
+  const mainVid = document.getElementById('mainVideo');
+  const previewOverlay = document.getElementById('previewOverlay');
+  const playBtn = document.getElementById('playToggle');
+  const pFill = document.getElementById('pFill');
+  const vTime = document.getElementById('vTime');
+  const pBar = document.getElementById('pBar');
+
+  // Imágenes del pack para el preview rotatorio
+  const PREVIEW_IMGS = IMGS.slice(0,6).map(i=>i.src);
+  let prevIdx = 0, prevCur = 'A';
+
+  function fmt(s){ const m=Math.floor(s/60),sec=Math.floor(s%60); return `${m}:${sec<10?'0':''}${sec}`; }
+
+  function rotatePreview() {
+    const layerA = document.getElementById('prevLayerA');
+    const layerB = document.getElementById('prevLayerB');
+    const nextIdx = (prevIdx + 1) % PREVIEW_IMGS.length;
+    const incoming = prevCur === 'A' ? layerB : layerA;
+    const outgoing  = prevCur === 'A' ? layerA : layerB;
+
+    incoming.style.backgroundImage = `url(${PREVIEW_IMGS[nextIdx]})`;
+    incoming.style.transition = 'none';
+    incoming.style.transform = 'scale(1.08)';
+    incoming.style.opacity = '0';
+    void incoming.offsetWidth;
+    incoming.style.transition = 'opacity 1.2s ease, transform 7s ease';
+    incoming.style.opacity = '1';
+    incoming.style.transform = 'scale(1)';
+
+    outgoing.style.transition = 'opacity 1s ease';
+    outgoing.style.opacity = '0';
+
+    prevIdx = nextIdx;
+    prevCur = prevCur === 'A' ? 'B' : 'A';
+  }
+
+  // Iniciar primera imagen
+  const layerA = document.getElementById('prevLayerA');
+  layerA.style.backgroundImage = `url(${PREVIEW_IMGS[0]})`;
+  layerA.style.opacity = '1';
+  layerA.style.transform = 'scale(1)';
+  setInterval(rotatePreview, 3500);
+
+  // Al dar play: ocultar preview, mostrar video
+  playBtn.onclick = () => {
+    if (mainVid.paused) {
+      previewOverlay.style.transition = 'opacity 0.4s';
+      previewOverlay.style.opacity = '0';
+      setTimeout(() => { previewOverlay.style.display = 'none'; }, 400);
+      mainVid.style.opacity = '1';
+      mainVid.play();
+      playBtn.innerText = '⏸';
+    } else {
+      mainVid.pause();
+      playBtn.innerText = '▶';
+    }
+  };
+
+  mainVid.onended = () => { playBtn.innerText = '▶'; pFill.style.width = '0%'; };
+  mainVid.ontimeupdate = () => {
+    if (mainVid.duration) {
+      pFill.style.width = (mainVid.currentTime / mainVid.duration) * 100 + '%';
+      vTime.innerText = `${fmt(mainVid.currentTime)} / ${fmt(mainVid.duration)}`;
+    }
+  };
+  pBar.onclick = e => {
+    const r = pBar.getBoundingClientRect();
+    mainVid.currentTime = ((e.clientX - r.left) / r.width) * mainVid.duration;
+  };
+
+  const fsBtn = document.getElementById('fsToggle'), vCont = document.getElementById('videoContainer');
+  fsBtn.onclick = () => {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      (vCont.requestFullscreen || vCont.webkitRequestFullscreen).call(vCont).catch(()=>{});
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+  };
+  document.addEventListener('fullscreenchange', () => { fsBtn.textContent = (document.fullscreenElement || document.webkitFullscreenElement) ? '✕' : '⛶'; });
+  document.addEventListener('webkitfullscreenchange', () => { fsBtn.textContent = (document.fullscreenElement || document.webkitFullscreenElement) ? '✕' : '⛶'; });
+
+  // ===== TIER CAROUSEL =====
+  let tcIdx = 0, tcTimer = null, tcTouchX = 0;
+  const TC_TOTAL = 5; // ahora son 5 banners (+ Meta Ads)
+
+  function tcGo(idx, resetTimer = true) {
+    if(idx < 0) idx = TC_TOTAL - 1;
+    if(idx >= TC_TOTAL) idx = 0;
+    tcIdx = idx;
+    const track = document.getElementById('tierTrack');
+    const slides = document.querySelectorAll('.tier-banner-slide');
+    if(slides.length === 0) return;
+    const slideW = slides[0].offsetWidth + 16;
+    track.style.transform = `translateX(-${idx * slideW}px)`;
+    const dots = document.getElementById('tierDots');
+    dots.innerHTML = Array.from({length:TC_TOTAL},(_,i)=>
+      `<div class="tier-dot${i===idx?' active':''}" onclick="tcGo(${i})"></div>`
+    ).join('');
+    if(resetTimer) { clearInterval(tcTimer); tcTimer = setInterval(()=>tcGo(tcIdx+1), 3500); }
+  }
+
+  function tcTouchStart(e) { tcTouchX = e.touches[0].clientX; }
+  function tcTouchEnd(e) { const dx = e.changedTouches[0].clientX - tcTouchX; if(Math.abs(dx) > 40) tcGo(dx < 0 ? tcIdx+1 : tcIdx-1); }
+
+  function tcOpenPanel(tier) {
+    document.querySelectorAll('.tier-plans-panel').forEach(p=>p.classList.remove('open'));
+    const p = document.getElementById(`panel-${tier}`);
+    if(p) {
+      p.classList.add('open');
+      setTimeout(()=>p.scrollIntoView({behavior:'smooth', block:'nearest'}),50);
+      tcInitHeroesForPanel(tier);
+      // Renderizar botones PayPal cuando el panel se abre
+      setTimeout(() => {
+        if(typeof PP_PLANS !== 'undefined') {
+          PP_PLANS.forEach(plan => {
+            const el = document.getElementById(plan.id);
+            if(el && el.offsetParent !== null) renderPayPalButton(plan.id, plan.planId);
+          });
+        }
+      }, 450);
+    }
+  }
+  function tcClosePanel(tier) { const p = document.getElementById(`panel-${tier}`); if(p) p.classList.remove('open'); }
+
+  const tcHeroesInited = {};
+  const HERO_IMGS = IMGS.map(i=>i.src);
+
+  function tcInitHeroesForPanel(tier) {
+    if(tcHeroesInited[tier]) return;
+    tcHeroesInited[tier] = true;
+    const map = { start:['hero-0-basic','hero-0-motion','hero-0-pro'], growth:['hero-1-basic','hero-1-motion','hero-1-pro'], premium:['hero-2-basic','hero-2-motion','hero-2-pro'], flash:[] };
+    const ids = map[tier] || [];
+    ids.forEach((id,i) => setTimeout(()=>heroRotatorInit(id, HERO_IMGS, i*3, 4000), i*400));
+  }
+
+  function heroRotatorInit(heroId, imgList, startIdx, intervalMs) {
+    const hero = document.getElementById(heroId);
+    if(!hero) return;
+    ['a','b'].forEach(k=>{ const l=document.createElement('div'); l.className='hero-img-layer'; l.id=`${heroId}-layer-${k}`; hero.insertBefore(l,hero.firstChild); });
+    let cur=0, idx=startIdx%imgList.length;
+    const la=document.getElementById(`${heroId}-layer-a`);
+    la.style.backgroundImage=`url(${imgList[idx]})`;
+    la.style.transition='none'; la.style.opacity='1'; la.style.transform='scale(1)';
+    setInterval(()=>{
+      idx=(idx+1)%imgList.length;
+      const nk=cur===0?'b':'a', ck=cur===0?'a':'b';
+      const nl=document.getElementById(`${heroId}-layer-${nk}`), cl=document.getElementById(`${heroId}-layer-${ck}`);
+      nl.style.transition='none'; nl.style.backgroundImage=`url(${imgList[idx]})`; nl.style.transform='scale(1.08)'; nl.style.opacity='0';
+      void nl.offsetWidth;
+      nl.style.transition='opacity 1s ease, transform 5s ease'; nl.style.opacity='1'; nl.style.transform='scale(1)';
+      cl.style.transition='opacity 0.8s ease'; cl.style.opacity='0';
+      cur=cur===0?1:0;
+    }, intervalMs);
+  }
+
+  tcGo(0, false);
+  tcTimer = setInterval(()=>tcGo(tcIdx+1), 3500);
+
+  // ===== WIZARD META ADS =====
+  const wzState = { file: null, fileUrl: null, link:'', sticker:'', ciudad:'', edad:'', keywords:'', focus:'', variants:[], selectedVariant:0, segmentacion:'' };
+
+  function wzGo(step) {
+    document.querySelectorAll('.wizard-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById(`wzStep${step}`).classList.add('active');
+    document.getElementById('wzFill').style.width = (step/6*100)+'%';
+    // Update preview on step 5
+    if(step===5) wzUpdatePreview();
+  }
+
+  function wzCheckStep1() {
+    const ok = document.getElementById('wzLink').value.trim() && document.getElementById('wzSticker').value.trim();
+    document.getElementById('wzNext1').disabled = !ok;
+    wzState.link = document.getElementById('wzLink').value.trim();
+    wzState.sticker = document.getElementById('wzSticker').value.trim();
+  }
+
+  function wzCheckStep2() {
+    const ok = document.getElementById('wzCiudad').value.trim() && document.getElementById('wzEdad').value.trim() && document.getElementById('wzKeywords').value.trim();
+    document.getElementById('wzNext2').disabled = !ok;
+    wzState.ciudad = document.getElementById('wzCiudad').value.trim();
+    wzState.edad = document.getElementById('wzEdad').value.trim();
+    wzState.keywords = document.getElementById('wzKeywords').value.trim();
+  }
+
+  function wzSelectFocus(focus, el) {
+    document.querySelectorAll('.wz-option').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+    wzState.focus = focus;
+    document.getElementById('wzNext3').disabled = false;
+  }
+
+  function wzHandleFile(input) {
+    const file = input.files[0]; if(!file) return;
+    wzState.file = file;
+    wzState.fileUrl = URL.createObjectURL(file);
+    const prev = document.getElementById('wzPreviewImg');
+    prev.src = wzState.fileUrl;
+    prev.style.display = 'block';
+    document.querySelector('.wz-upload .wz-upload-text').textContent = '✅ ' + file.name;
+    wzCheckStep1();
+  }
+
+  async function wzGenerate() {
+    document.getElementById('wzGenerating').style.display = 'block';
+    document.getElementById('wzVariants').style.display = 'none';
+    document.getElementById('wzNext4').disabled = true;
+
+    const prompt = `Sos un experto en Meta Ads para hamburguerías. 
+Generá exactamente este JSON sin backticks ni markdown:
+{"v1":"texto enfocado en el DOLOR del cliente, máximo 90 caracteres, directo y con gancho","v2":"texto enfocado en el BENEFICIO principal, máximo 90 caracteres, llamativo","v3":"texto de PRUEBA SOCIAL con números o testimonios implícitos, máximo 90 caracteres","seg":"Radio: Xkm · Edad: ${wzState.edad} · Intereses: ${wzState.keywords}"}
+Contexto: ciudad ${wzState.ciudad}, producto hamburguesería, sticker "${wzState.sticker}", foco preferido "${wzState.focus}".`;
+
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400, messages:[{role:'user',content:prompt}] })
+      });
+      const data = await r.json();
+      const raw = (data.content&&data.content[0]&&data.content[0].text||'{}').replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(raw);
+      wzState.variants = [parsed.v1||'', parsed.v2||'', parsed.v3||''];
+      wzState.segmentacion = parsed.seg || `Radio: 3km · Edad: ${wzState.edad} · Intereses: ${wzState.keywords}`;
+    } catch {
+      wzState.variants = [
+        '¿Cansado de la comida fría que llega sin sabor? Nosotros lo cambiamos.',
+        'La mejor hamburguesa de ' + (wzState.ciudad||'la ciudad') + ' te espera. Pedí ahora.',
+        'Miles de clientes ya la eligieron. ¿Cuándo vas a probarla vos?'
+      ];
+      wzState.segmentacion = `Radio: 3km · Edad: ${wzState.edad||'18-35'} · Intereses: ${wzState.keywords||'comida, delivery'}`;
+    }
+
+    document.getElementById('wzVarText1').textContent = wzState.variants[0];
+    document.getElementById('wzVarText2').textContent = wzState.variants[1];
+    document.getElementById('wzVarText3').textContent = wzState.variants[2];
+    document.getElementById('wzGenerating').style.display = 'none';
+    document.getElementById('wzVariants').style.display = 'block';
+  }
+
+  function wzSelectVariant(idx, el) {
+    document.querySelectorAll('.wz-variant').forEach(v=>v.classList.remove('selected'));
+    el.classList.add('selected');
+    wzState.selectedVariant = idx;
+    document.getElementById('wzNext4').disabled = false;
+  }
+
+  function wzUpdatePreview() {
+    const caption = wzState.variants[wzState.selectedVariant] || '';
+    document.getElementById('wzAdCaption').textContent = caption;
+    document.getElementById('wzAdLink').textContent = wzState.link || 'tulocal.com';
+    document.getElementById('wzSegPreview').textContent = wzState.segmentacion;
+    const imgEl = document.getElementById('wzAdImage');
+    if (wzState.fileUrl) {
+      imgEl.innerHTML = `<img src="${wzState.fileUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+    }
+  }
+
+  function wzSimulatePay() {
+    document.getElementById('wzPaywall').style.display = 'none';
+    const unlocked = document.getElementById('wzUnlocked');
+    unlocked.style.display = 'block';
+    document.getElementById('wzFinalCaption').textContent = wzState.variants[wzState.selectedVariant] || '';
+    document.getElementById('wzFinalSeg').textContent = wzState.segmentacion;
+  }
+
+  async function wzCopy(fieldId, btnId, label) {
+    const txt = document.getElementById(fieldId).textContent;
+    const btn = document.getElementById(btnId);
+    try {
+      await navigator.clipboard.writeText(txt);
+      btn.textContent = '✅ Copiado';
+      btn.classList.add('copied');
+      setTimeout(()=>{ btn.textContent = label; btn.classList.remove('copied'); }, 1800);
+    } catch { alert('Copialo manualmente.'); }
+  }
+
+  // ===== SOPORTE / CALENDLY =====
+  function toggleCalendly() {
+    const wrap = document.getElementById('calendlyWrap');
+    const arrow = document.getElementById('soporteArrow');
+    const isOpen = wrap.classList.contains('open');
+    wrap.classList.toggle('open', !isOpen);
+    arrow.textContent = isOpen ? '▼' : '▲';
+  }
+
+  // ===== CHAT CON FALLBACK OFFLINE INTELIGENTE =====
+  const cpHistory = [];
+  const cpMessages = document.getElementById('cpMessages');
+  const cpInput = document.getElementById('cpInput');
+  const cpSendBtn = document.getElementById('cpSendBtn');
+  const chatPanel = document.getElementById('chatPanel');
+  let chatOpen = false;
+
+  // Respuestas offline por palabras clave
+  const OFFLINE_RESPONSES = [
+    { keys: ['hook','gancho','frase','titulo','texto'], reply: `Para una hamburguesería estos hooks funcionan mejor:\n\n🔥 "¿La última vez que comiste algo así fue... nunca."\n🔥 "No es una hamburguesa. Es un problema."\n🔥 "La que todo el barrio habla pero pocos consiguen."\n\nUsá uno de estos en tu historia con el sticker de enlace y vas a ver la diferencia.` },
+    { keys: ['historia','story','instagram','ig','stories'], reply: `Para Instagram Stories que venden en hamburguesería:\n\n1️⃣ Mostrá el proceso (el fuego, la carne, el queso que se derrite)\n2️⃣ Usá texto en los primeros 2 segundos para detener el scroll\n3️⃣ El sticker de enlace siempre en la mitad superior\n4️⃣ Publicá entre 11-13hs y 19-21hs cuando hay más hambre 🤙` },
+    { keys: ['precio','caro','descuento','promo','oferta'], reply: `Estrategia de precio para hamburguesería:\n\n💡 No bajes el precio, subí el valor percibido. Mostrá los ingredientes, el origen, el proceso.\n\n💡 Combos limitados funcionan mejor que descuentos permanentes.\n\n💡 "Sólo hoy" o "Últimas unidades" generan urgencia real.` },
+    { keys: ['venta','vender','ventas','clientes','pedido'], reply: `Para aumentar ventas esta semana:\n\n📲 Publicá una historia por día con el pack que tenés\n📲 Respondé todos los mensajes en menos de 5 minutos\n📲 Agregá urgencia: "Solo hasta las 22hs"\n📲 Pedile a clientes que etiqueten tu local en sus historias` },
+    { keys: ['meta','ads','anuncio','publicidad','facebook'], reply: `Para tu anuncio en Meta Ads:\n\n🎯 Segmentá en radio de 3-5km del local\n🎯 Edad 18-35 con intereses en comida, delivery y foodie\n🎯 Usá el mismo contenido del pack — ya está optimizado\n🎯 Presupuesto mínimo recomendado: $5 USD/día por 7 días\n\nUsá el wizard de Meta Ads en esta app para generar el copy listo.` },
+    { keys: ['reel','video','reels'], reply: `Para Reels que convierten en hamburguesería:\n\n🎬 Duración ideal: 7 a 15 segundos\n🎬 Los primeros 2 segundos son todo — entrá directo a lo visual\n🎬 Música trending en Reels de comida: beats urbanos o trap suave\n🎬 El texto en pantalla es obligatorio — mucha gente mira sin sonido` },
+    { keys: ['sticker','enlace','link'], reply: `El sticker de enlace en Instagram Stories:\n\n1. Subí tu historia\n2. Tocá el ícono de sticker (😊)\n3. Elegí "Enlace"\n4. Pegá el link de tu landing\n5. Como texto del sticker usá la frase que copiaste del pack\n\nEl sticker funciona para CUALQUIER cuenta, sin necesidad de 10k seguidores.` },
+    { keys: ['calendario','cuando','horario','publicar','dia'], reply: `Mejores horarios para publicar hamburguesería:\n\n🕐 11:00 - 13:00hs (antes del almuerzo)\n🕕 17:00 - 19:00hs (merienda / antojo tarde)\n🕘 20:00 - 22:00hs (antes de la cena)\n\nDías con más engagement: jueves, viernes y domingo.` },
+  ];
+
+  function offlineReply(query) {
+    const q = query.toLowerCase();
+    for (const r of OFFLINE_RESPONSES) {
+      if (r.keys.some(k => q.includes(k))) return r.reply;
+    }
+    return `Buena pregunta. Para hamburguerías que venden por Instagram te recomiendo:\n\n📌 Publicar contenido visual todos los días con el pack\n📌 Responder DMs rápido — la velocidad de respuesta convierte\n📌 Usar el sticker de enlace en cada historia\n📌 Activar recordatorio en el calendario de esta app\n\n¿Hay algo específico en lo que te puedo ayudar?`;
+  }
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    chatPanel.classList.toggle('open', chatOpen);
+    document.getElementById('fabIcon').textContent = chatOpen ? '✕' : '💬';
+    if (chatOpen) setTimeout(()=>cpInput.focus(), 300);
+  }
+
+  cpInput.addEventListener('input', () => {
+    const a = cpInput.value.trim() !== '';
+    cpSendBtn.className = a ? 'active' : '';
+    const s = a ? '#fff' : '#444';
+    document.getElementById('cpArrow1').setAttribute('stroke', s);
+    document.getElementById('cpArrow2').setAttribute('stroke', s);
+  });
+  cpInput.addEventListener('keydown', e => { if(e.key==='Enter') cpSendMsg(); });
+
+  async function cpSendMsg(text) {
+    const query = text || cpInput.value.trim(); if(!query) return;
+    const sug = document.getElementById('cpSuggestions'); if(sug) sug.remove();
+    cpInput.value = ''; cpSendBtn.className = '';
+    document.getElementById('cpArrow1').setAttribute('stroke','#444');
+    document.getElementById('cpArrow2').setAttribute('stroke','#444');
+    cpAppendMsg('user', query);
+    cpHistory.push({role:'user', content:query});
+    const tp = cpAppendTyping();
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 500,
+          system: 'Sos S2A Strategist, experto en marketing para hamburguerías y negocios locales. Respondés en español, de forma concisa y accionable. Máximo 3 párrafos cortos.',
+          messages: cpHistory
+        })
+      });
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      const reply = (data.content && data.content[0] && data.content[0].text) || offlineReply(query);
+      tp.remove(); cpAppendMsg('assistant', reply);
+      cpHistory.push({role:'assistant', content:reply});
+    } catch {
+      // Fallback offline inteligente
+      tp.remove();
+      const reply = offlineReply(query);
+      cpAppendMsg('assistant', reply);
+      cpHistory.push({role:'assistant', content:reply});
+    }
+    cpMessages.scrollTop = cpMessages.scrollHeight;
+  }
+
+  function cpAppendMsg(role, text) {
+    const d = document.createElement('div'); d.className = `cp-msg ${role}`;
+    d.innerHTML = role==='assistant'
+      ? `<div class="cp-msg-avatar">S</div><div class="cp-bubble assistant">${text.replace(/\n/g,'<br>')}</div>`
+      : `<div class="cp-bubble user">${text}</div>`;
+    cpMessages.appendChild(d); cpMessages.scrollTop = cpMessages.scrollHeight; return d;
+  }
+
+  function cpAppendTyping() {
+    const d = document.createElement('div'); d.className = 'cp-msg assistant';
+    d.innerHTML = `<div class="cp-msg-avatar">S</div><div class="cp-bubble assistant"><div class="cp-typing"><div class="cp-dot"></div><div class="cp-dot"></div><div class="cp-dot"></div></div></div>`;
+    cpMessages.appendChild(d); cpMessages.scrollTop = cpMessages.scrollHeight; return d;
+  }
+</script>
+
+<!-- PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=ARHyKS7brGFMI1_aDgXY8F87dsko09zcLsf7ulVaNBi9yJ38TKCt-PQ6oCZdXcGMpgAMeXmYPiazdeA0&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+<script>
+  // Mapa de contenedores y sus plan_id
+  const PP_PLANS = [
+    { id: 'pp-start-basic',    planId: 'P-23B493830J7534834NHQ5G6Q' },
+    { id: 'pp-start-motion',   planId: 'P-2TG94582K0155811NNHQ5KLY' },
+    { id: 'pp-start-pro',      planId: 'P-5MV130026J4036916NHQ5MCY' },
+    { id: 'pp-growth-basic',   planId: 'P-4B114925PS7553024NHQ5OBI' },
+    { id: 'pp-growth-motion',  planId: 'P-94M604034J491873TNHQ5PPA' },
+    { id: 'pp-growth-pro',     planId: 'P-88B92692ER102991YNHQ5Q5Y' },
+    { id: 'pp-premium-basic',  planId: 'P-1FU869136L951873KNHQ5SNA' },
+    { id: 'pp-premium-motion', planId: 'P-4FJ199159J267321DNHQ5UIY' },
+    { id: 'pp-premium-pro',    planId: 'P-61S525445R303490MNHQ5VQY' },
+  ];
+
+  // Renderizar cada botón en su contenedor cuando el panel se abre
+  const ppRendered = {};
+
+  function renderPayPalButton(containerId, planId) {
+    if (ppRendered[containerId]) return;
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    ppRendered[containerId] = true;
+    paypal.Buttons({
+      style: {
+        shape:  'rect',
+        color:  'gold',
+        layout: 'horizontal',
+        label:  'subscribe',
+        height: 36,
+        tagline: false
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({ plan_id: planId });
+      },
+      onApprove: function(data, actions) {
+        alert('¡Suscripción activada! ID: ' + data.subscriptionID);
+        activarAdmin(data.plan_id);
+      },
+      onError: function(err) {
+        console.error('PayPal error:', err);
+      }
+    }).render('#' + containerId);
+  }
+
+  // Observer: renderiza los botones cuando el panel entra en viewport
+  const ppObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        PP_PLANS.forEach(p => {
+          if (p.id === el.id) renderPayPalButton(p.id, p.planId);
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+
+  // Registrar observadores cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', () => {
+    PP_PLANS.forEach(p => {
+      const el = document.getElementById(p.id);
+      if (el) ppObserver.observe(el);
+    });
+  });
+
+  // PayPal render hook integrado directamente en tcOpenPanel
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://nryokltlkwpzhrpmtiqz.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yeW9rbHRsa3dwemhycG10aXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTg2MjQsImV4cCI6MjA5MzU5NDYyNH0.vT_zIOB5HjL6Y17EpXXyVamZ_ntbRXJDphJjvTlMH2U';
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const adminHTML = `
+    <div id="s2a-wheel" style="display:none; position:fixed; top:20px; right:20px; z-index:10000; cursor:pointer; background:#ff2d78; border-radius:50%; padding:10px; box-shadow:0 0 15px #ff2d78;">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/settings.png" width="30">
+    </div>
+    <div id="s2a-panel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; max-width:400px; background:#0e0e1a; border:2px solid #ff2d78; border-radius:20px; padding:25px; z-index:10001; color:white; font-family:sans-serif;">
+      <h3 style="color:#ff2d78; margin-bottom:15px;">CONFIGURACIÓN DEL PLAN</h3>
+      <input type="text" id="s2a-video" placeholder="Link del Video" style="width:100%; padding:10px; margin-bottom:10px; background:#1a1a2e; border:1px solid #333; color:white;">
+      <input type="text" id="s2a-wa" placeholder="WhatsApp (549...)" style="width:100%; padding:10px; margin-bottom:15px; background:#1a1a2e; border:1px solid #333; color:white;">
+      <button onclick="guardarConfig()" id="btn-save" style="width:100%; background:#ff2d78; color:white; border:none; padding:12px; font-weight:bold; cursor:pointer;">GUARDAR Y OBTENER LINK</button>
+      <div id="s2a-result" style="margin-top:15px; font-size:12px; color:#ffe600; display:none;"></div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', adminHTML);
+
+  function activarAdmin(planId) {
+    let numeros = (planId === 'P-94M604034J491873TNHQ5PPA') ? '1,2,3,4,13,14' : '1,2,3,4';
+    localStorage.setItem('s2a_active_nums', numeros);
+    document.getElementById('s2a-wheel').style.display = 'block';
+  }
+
+  // Lógica para detectar el test desde el celular
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('test') === 'true') {
+        activarAdmin('P-94M604034J491873TNHQ5PPA');
+    }
+    
+    // Evento de la ruedita
+    const wheel = document.getElementById('s2a-wheel');
+    if (wheel) {
+      wheel.onclick = () => {
+        const p = document.getElementById('s2a-panel');
+        p.style.display = p.style.display === 'none' ? 'block' : 'none';
+      };
+    }
+  });
+
+  async function guardarConfig() {
+    const btn = document.getElementById('btn-save');
+    const video = document.getElementById('s2a-video').value;
+    const wa = document.getElementById('s2a-wa').value;
+    const nums = localStorage.getItem('s2a_active_nums');
+    btn.innerText = 'GUARDANDO...';
+
+    const { data, error } = await supabase.from('servicios_s2a').insert([{ link_video_l1: video, wa_num: wa, plan_activas: nums }]).select();
+
+    if (!error && data) {
+      const link = `https://micro-landing-s2a-supabase.vercel.app/?id=${data[0].id}`;
+      document.getElementById('s2a-result').innerHTML = `¡LISTO! TU LINK ES:<br>${link}`;
+      document.getElementById('s2a-result').style.display = 'block';
+      btn.innerText = 'GUARDADO';
+    }
+  }
+</script>
+
+</body>
+</html>
