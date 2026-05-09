@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S2A — Panel Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#07070f; --bg2:#0e0e1a; --fucsia:#ff2d78; --amarillo:#ffe600; --gris:#333345; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:#fff; font-family:'Nunito',sans-serif; min-height:100vh; padding:24px 16px 60px; }
+
+  h1 { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; color:#fff; margin-bottom:4px; }
+  h1 em { color:var(--fucsia); font-style:normal; }
+  .sub { font-size:11px; color:#444; letter-spacing:2px; margin-bottom:28px; }
+
+  .card { background:var(--bg2); border:1px solid rgba(255,45,120,0.15); border-radius:16px; padding:20px; margin-bottom:16px; }
+  .card-title { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; color:var(--fucsia); margin-bottom:14px; }
+
+  label { font-size:11px; font-weight:700; letter-spacing:1px; color:#666; display:block; margin-bottom:5px; text-transform:uppercase; }
+  input, textarea { width:100%; background:#111; border:1px solid var(--gris); color:#fff; border-radius:8px; padding:11px 12px; font-size:14px; font-family:'Nunito',sans-serif; outline:none; margin-bottom:14px; transition:border .2s; }
+  input:focus, textarea:focus { border-color:var(--fucsia); }
+  textarea { resize:vertical; min-height:70px; }
+
+  /* UPLOAD ZONE */
+  .upload-zone { border:2px dashed var(--gris); border-radius:10px; padding:20px; text-align:center; cursor:pointer; transition:.2s; margin-bottom:14px; position:relative; }
+  .upload-zone:hover, .upload-zone.drag { border-color:var(--fucsia); background:rgba(255,45,120,0.05); }
+  .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .upload-icon { font-size:28px; margin-bottom:6px; }
+  .upload-label { font-size:12px; color:#555; }
+  .upload-preview { width:100%; height:120px; object-fit:cover; border-radius:8px; margin-top:10px; display:none; }
+  .upload-preview.show { display:block; }
+  .upload-progress { height:3px; background:var(--gris); border-radius:2px; margin-top:8px; display:none; }
+  .upload-progress-bar { height:100%; background:var(--fucsia); border-radius:2px; width:0; transition:width .3s; }
+  .upload-progress.show { display:block; }
+  .upload-ok { font-size:10px; color:#25d366; margin-top:4px; display:none; }
+  .upload-ok.show { display:block; }
+
+  /* SLUG */
+  .slug-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; }
+  .slug-row input { margin-bottom:0; flex:1; }
+  .btn-gen { background:var(--gris); color:#fff; border:none; border-radius:8px; padding:11px 14px; font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:1px; cursor:pointer; white-space:nowrap; }
+  .btn-gen:hover { background:var(--fucsia); }
+
+  /* SUBMIT */
+  .btn-save { width:100%; background:var(--fucsia); color:#fff; border:none; border-radius:10px; padding:16px; font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; cursor:pointer; margin-top:8px; transition:.2s; }
+  .btn-save:hover { background:#ff0060; }
+  .btn-save:disabled { background:#333; color:#555; cursor:not-allowed; }
+
+  /* RESULTADO */
+  #resultado { display:none; background:#0a1a0a; border:1px solid #25d366; border-radius:12px; padding:18px; margin-top:16px; }
+  #resultado h3 { font-family:'Bebas Neue',sans-serif; color:#25d366; font-size:16px; letter-spacing:1px; margin-bottom:8px; }
+  .link-box { background:#111; border-radius:8px; padding:12px; font-size:13px; color:var(--amarillo); word-break:break-all; margin-bottom:10px; }
+  .btn-copy-link { width:100%; background:var(--amarillo); color:#000; border:none; border-radius:8px; padding:12px; font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:1px; cursor:pointer; margin-bottom:8px; }
+  .preview-frame-wrap { margin-top:12px; }
+  .preview-label { font-size:10px; color:#444; letter-spacing:2px; margin-bottom:6px; }
+  .preview-frame { width:100%; height:500px; border:1px solid var(--gris); border-radius:10px; background:#000; }
+
+  .error-msg { font-size:12px; color:#ff4444; margin-top:8px; display:none; }
+</style>
+</head>
+<body>
+
+<h1>S2A <em>ADMIN</em></h1>
+<div class="sub">CONFIGURACIÓN DE PUBLICACIÓN</div>
+
+<!-- DATOS DEL NEGOCIO -->
+<div class="card">
+  <div class="card-title">📋 DATOS DEL PRODUCTO</div>
+
+  <label>Nombre del producto</label>
+  <input type="text" id="f-titulo" placeholder="Ej: Pizza Criolla">
+
+  <label>Descripción / ingredientes</label>
+  <textarea id="f-desc" placeholder="Ej: Masa casera · Mozzarella · Tomate · Huevo"></textarea>
+
+  <label>Precio normal (tachado)</label>
+  <input type="text" id="f-precio-normal" placeholder="Ej: 10000">
+
+  <label>Precio de venta</label>
+  <input type="text" id="f-precio-venta" placeholder="Ej: 8500">
+
+  <label>Número WhatsApp (con código de país)</label>
+  <input type="text" id="f-wa" placeholder="Ej: 5493794946552">
+
+  <label>Mensaje WhatsApp (opcional)</label>
+  <textarea id="f-wa-msg" placeholder="Hola! Quiero pedir..."></textarea>
+</div>
+
+<!-- IMÁGENES -->
+<div class="card">
+  <div class="card-title">🖼 IMÁGENES</div>
+
+  <label>Imagen del producto</label>
+  <div class="upload-zone" id="zone-imagen">
+    <input type="file" accept="image/*" onchange="subirImagen(this,'imagen')">
+    <div class="upload-icon">📸</div>
+    <div class="upload-label">Tocá para subir la imagen del producto</div>
+    <div class="upload-progress" id="prog-imagen"><div class="upload-progress-bar" id="bar-imagen"></div></div>
+    <div class="upload-ok" id="ok-imagen">✔ Subida correctamente</div>
+    <img class="upload-preview" id="prev-imagen">
+  </div>
+
+  <label>Logo / foto de perfil</label>
+  <div class="upload-zone" id="zone-logo">
+    <input type="file" accept="image/*" onchange="subirImagen(this,'logo')">
+    <div class="upload-icon">🏪</div>
+    <div class="upload-label">Tocá para subir el logo del negocio</div>
+    <div class="upload-progress" id="prog-logo"><div class="upload-progress-bar" id="bar-logo"></div></div>
+    <div class="upload-ok" id="ok-logo">✔ Subida correctamente</div>
+    <img class="upload-preview" id="prev-logo">
+  </div>
+</div>
+
+<!-- LINK CORTO -->
+<div class="card">
+  <div class="card-title">🔗 LINK CORTO</div>
+  <label>Slug personalizado (sin espacios)</label>
+  <div class="slug-row">
+    <input type="text" id="f-slug" placeholder="ej: pizza-criolla">
+    <button class="btn-gen" onclick="generarSlug()">AUTO</button>
+  </div>
+  <div style="font-size:11px;color:#444;">Tu link será: <span id="slug-preview" style="color:var(--amarillo)">...tudominio.vercel.app/?s=</span></div>
+</div>
+
+<button class="btn-save" id="btn-save" onclick="guardar()">GUARDAR Y GENERAR LINK</button>
+<div class="error-msg" id="error-msg"></div>
+
+<!-- RESULTADO -->
+<div id="resultado">
+  <h3>✅ ¡LISTO! TU LINK ES:</h3>
+  <div class="link-box" id="link-generado"></div>
+  <button class="btn-copy-link" onclick="copiarLink()">📋 COPIAR LINK</button>
+  <div class="preview-frame-wrap">
+    <div class="preview-label">VISTA PREVIA</div>
+    <iframe class="preview-frame" id="preview-iframe" src=""></iframe>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://nryokltlkwpzhrpmtiqz.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yeW9rbHRsa3dwemhycG10aXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTg2MjQsImV4cCI6MjA5MzU5NDYyNH0.vT_zIOB5HjL6Y17EpXXyVamZ_ntbRXJDphJjvTlMH2U';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const CLOUD_NAME = 'ds2udm1nc';
+  const UPLOAD_PRESET = 's2a_uploads';
+  // Cambiá esta URL por la de tu landing receptora en Vercel
+  const LANDING_BASE = 'https://micro-landing-s2a-supabase.vercel.app';
+
+  let urls = { imagen: '', logo: '' };
+
+  async function subirImagen(input, tipo) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const prog = document.getElementById(`prog-${tipo}`);
+    const bar = document.getElementById(`bar-${tipo}`);
+    const ok = document.getElementById(`ok-${tipo}`);
+    const prev = document.getElementById(`prev-${tipo}`);
+
+    prog.classList.add('show');
+    bar.style.width = '30%';
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', UPLOAD_PRESET);
+    fd.append('folder', 's2a');
+
+    try {
+      bar.style.width = '60%';
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd });
+      const data = await res.json();
+      bar.style.width = '100%';
+      urls[tipo] = data.secure_url;
+      prev.src = data.secure_url;
+      prev.classList.add('show');
+      ok.classList.add('show');
+    } catch(e) {
+      bar.style.background = '#ff4444';
+    }
+  }
+
+  function generarSlug() {
+    const titulo = document.getElementById('f-titulo').value;
+    const base = titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    const rand = Math.random().toString(36).slice(2,6);
+    document.getElementById('f-slug').value = base ? `${base}-${rand}` : `pub-${rand}`;
+    actualizarSlugPreview();
+  }
+
+  function actualizarSlugPreview() {
+    const slug = document.getElementById('f-slug').value;
+    document.getElementById('slug-preview').textContent = `${LANDING_BASE}/?s=${slug}`;
+  }
+
+  document.getElementById('f-slug').addEventListener('input', actualizarSlugPreview);
+
+  async function guardar() {
+    const btn = document.getElementById('btn-save');
+    const errEl = document.getElementById('error-msg');
+    errEl.style.display = 'none';
+
+    const titulo = document.getElementById('f-titulo').value.trim();
+    const wa = document.getElementById('f-wa').value.trim();
+    const slug = document.getElementById('f-slug').value.trim();
+
+    if (!titulo || !wa || !slug) {
+      errEl.textContent = 'Completá al menos nombre, WhatsApp y slug.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'GUARDANDO...';
+
+    const payload = {
+      titulo_l1: titulo,
+      desc_l1: document.getElementById('f-desc').value.trim(),
+      precio_normal: document.getElementById('f-precio-normal').value.trim(),
+      precio_venta: document.getElementById('f-precio-venta').value.trim(),
+      wa_num: wa,
+      wa_msg: document.getElementById('f-wa-msg').value.trim(),
+      imagen_url: urls.imagen || null,
+      logo_url: urls.logo || null,
+      slug: slug
+    };
+
+    const { data, error } = await db.from('servicios_s2a').insert([payload]).select().single();
+
+    if (error) {
+      errEl.textContent = error.message.includes('unique') ? 'Ese slug ya existe, elegí otro.' : `Error: ${error.message}`;
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'GUARDAR Y GENERAR LINK';
+      return;
+    }
+
+    const link = `${LANDING_BASE}/?s=${slug}`;
+    document.getElementById('link-generado').textContent = link;
+    document.getElementById('preview-iframe').src = link;
+    document.getElementById('resultado').style.display = 'block';
+    document.getElementById('resultado').scrollIntoView({ behavior:'smooth' });
+    btn.textContent = '✔ GUARDADO';
+  }
+
+  function copiarLink() {
+    const link = document.getElementById('link-generado').textContent;
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.querySelector('.btn-copy-link');
+      btn.textContent = '✔ COPIADO';
+      setTimeout(() => btn.textContent = '📋 COPIAR LINK', 2000);
+    });
+  }
+</script>
+</body>
+</html>
