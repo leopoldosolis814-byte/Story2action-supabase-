@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>S2A — Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#07070f; color:#fff; font-family:'Nunito',sans-serif; min-height:100dvh; padding:24px 16px 48px; }
+.header { text-align:center; margin-bottom:28px; }
+.header h1 { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; }
+.header h1 em { color:#ff2d78; font-style:normal; }
+.header p { font-size:11px; color:#444; letter-spacing:2px; margin-top:4px; }
+
+.group { margin-bottom:24px; }
+.group-title { font-family:'Bebas Neue',sans-serif; font-size:11px; letter-spacing:3px; color:#ff2d78; margin-bottom:10px; padding-left:4px; }
+
+.btn-link { display:flex; align-items:center; gap:14px; background:#0e0e1a; border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:14px 16px; text-decoration:none; color:#fff; margin-bottom:8px; transition:.15s; active:opacity:.8; }
+.btn-link:active { opacity:.7; transform:scale(.98); }
+.btn-icon { font-size:24px; flex-shrink:0; width:44px; height:44px; display:flex; align-items:center; justify-content:center; background:#111; border-radius:10px; }
+.btn-text { flex:1; }
+.btn-name { font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:1px; margin-bottom:2px; }
+.btn-desc { font-size:11px; color:#555; line-height:1.4; }
+.btn-arrow { color:#333; font-size:14px; flex-shrink:0; }
+
+.btn-link.primary { border-color:rgba(255,45,120,0.25); background:rgba(255,45,120,0.06); }
+.btn-link.primary .btn-icon { background:rgba(255,45,120,0.15); }
+.btn-link.yellow { border-color:rgba(255,230,0,0.2); background:rgba(255,230,0,0.04); }
+.btn-link.yellow .btn-name { color:#ffe600; }
+.btn-link.yellow .btn-icon { background:rgba(255,230,0,0.1); }
+.btn-link.green { border-color:rgba(37,211,102,0.2); background:rgba(37,211,102,0.04); }
+.btn-link.green .btn-name { color:#25d366; }
+.btn-link.green .btn-icon { background:rgba(37,211,102,0.1); }
+
+footer { text-align:center; margin-top:16px; font-size:10px; color:#333; letter-spacing:2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>S2A <em>PANEL</em></h1>
+  <p>TUS ACCESOS RÁPIDOS</p>
+</div>
+
+<!-- CLIENTES -->
+<div class="group">
+  <div class="group-title">🎯 PARA CLIENTES</div>
+
+  <a href="https://story2action-supabase.vercel.app" target="_blank" class="btn-link primary">
+    <div class="btn-icon">🚀</div>
+    <div class="btn-text">
+      <div class="btn-name">LANDING PRINCIPAL</div>
+      <div class="btn-desc">La página de ventas con los packs. La que le enviás a prospectos.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://story2action-supabase.vercel.app/admin.html" target="_blank" class="btn-link">
+    <div class="btn-icon">⚙️</div>
+    <div class="btn-text">
+      <div class="btn-name">ADMIN CLIENTE (SIMPLE)</div>
+      <div class="btn-desc">Panel donde el cliente carga sus datos para la micro-landing de gastronomía, barbería o nail.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://micro-landing-s2a-supabase.vercel.app/admin-pro.html" target="_blank" class="btn-link">
+    <div class="btn-icon">⚙️</div>
+    <div class="btn-text">
+      <div class="btn-name">ADMIN CLIENTE (PRO)</div>
+      <div class="btn-desc">Panel para clientes de venta consultiva — paneles, infoproductores, servicios high ticket.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://micro-landing-s2a-supabase.vercel.app" target="_blank" class="btn-link">
+    <div class="btn-icon">📱</div>
+    <div class="btn-text">
+      <div class="btn-name">MICRO-LANDING SIMPLE</div>
+      <div class="btn-desc">La landing receptora que genera el sistema para gastronomía, barbería y nail.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://micro-landing-s2a-supabase.vercel.app/landing-pro.html" target="_blank" class="btn-link">
+    <div class="btn-icon">📱</div>
+    <div class="btn-text">
+      <div class="btn-name">LANDING PRO</div>
+      <div class="btn-desc">Landing premium para clientes de venta consultiva con galería, testimonios y urgencia.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+</div>
+
+<!-- TU PANEL -->
+<div class="group">
+  <div class="group-title">🔧 TUS HERRAMIENTAS</div>
+
+  <a href="https://story2action-supabase.vercel.app/master.html" target="_blank" class="btn-link yellow">
+    <div class="btn-icon">👑</div>
+    <div class="btn-text">
+      <div class="btn-name">PANEL MASTER</div>
+      <div class="btn-desc">Gestión de galería, planes, precios y códigos de acceso por rubro. Contraseña: bravery@123</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+</div>
+
+<!-- PRUEBA Y TEST -->
+<div class="group">
+  <div class="group-title">🧪 TESTING</div>
+
+  <a href="https://story2action-supabase.vercel.app/?test=true" target="_blank" class="btn-link green">
+    <div class="btn-icon">🔬</div>
+    <div class="btn-text">
+      <div class="btn-name">MODO TEST</div>
+      <div class="btn-desc">Activa GROWTH Motion sin pagar. Para probar el flujo completo.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://story2action-supabase.vercel.app/?rubro=gastronomia" target="_blank" class="btn-link">
+    <div class="btn-icon">🍔</div>
+    <div class="btn-text">
+      <div class="btn-name">LANDING GASTRONOMÍA</div>
+      <div class="btn-desc">La landing con el rubro gastronómico activo.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://story2action-supabase.vercel.app/?rubro=barberia" target="_blank" class="btn-link">
+    <div class="btn-icon">✂️</div>
+    <div class="btn-text">
+      <div class="btn-name">LANDING BARBERÍA</div>
+      <div class="btn-desc">La landing con el rubro barbería activo.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://story2action-supabase.vercel.app/?rubro=nail" target="_blank" class="btn-link">
+    <div class="btn-icon">💅</div>
+    <div class="btn-text">
+      <div class="btn-name">LANDING NAIL</div>
+      <div class="btn-desc">La landing con el rubro nail activo.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+</div>
+
+<!-- INFRAESTRUCTURA -->
+<div class="group">
+  <div class="group-title">☁️ INFRAESTRUCTURA</div>
+
+  <a href="https://supabase.com/dashboard" target="_blank" class="btn-link">
+    <div class="btn-icon">🗄️</div>
+    <div class="btn-text">
+      <div class="btn-name">SUPABASE</div>
+      <div class="btn-desc">Base de datos — clientes, galería, planes, códigos y landings pro.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://cloudinary.com/console" target="_blank" class="btn-link">
+    <div class="btn-icon">📸</div>
+    <div class="btn-text">
+      <div class="btn-name">CLOUDINARY</div>
+      <div class="btn-desc">Hosting de imágenes y videos. Cloud name: ds2udm1nc</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://vercel.com/dashboard" target="_blank" class="btn-link">
+    <div class="btn-icon">▲</div>
+    <div class="btn-text">
+      <div class="btn-name">VERCEL</div>
+      <div class="btn-desc">Deploy automático desde GitHub. Dos proyectos activos.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://github.com/leopoldosolis814-byte" target="_blank" class="btn-link">
+    <div class="btn-icon">🐙</div>
+    <div class="btn-text">
+      <div class="btn-name">GITHUB</div>
+      <div class="btn-desc">Repos: Story2action-supabase y Micro-landing-s2a-supabase.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+
+  <a href="https://www.paypal.com/signin" target="_blank" class="btn-link">
+    <div class="btn-icon">💳</div>
+    <div class="btn-text">
+      <div class="btn-name">PAYPAL</div>
+      <div class="btn-desc">Gestión de suscripciones y webhook de pagos.</div>
+    </div>
+    <div class="btn-arrow">›</div>
+  </a>
+</div>
+
+<footer>S2A · PANEL DE CONTROL PERSONAL</footer>
+
+</body>
+</html>
